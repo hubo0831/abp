@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 
@@ -13,18 +14,18 @@ namespace Volo.Abp.Reflection
 
         public TypeFinder(IAssemblyFinder assemblyFinder)
         {
-            _assemblyFinder = assemblyFinder;
+            this._assemblyFinder = assemblyFinder;
 
-            _types = new Lazy<IReadOnlyList<Type>>(FindAll, LazyThreadSafetyMode.ExecutionAndPublication);
+            this._types = new Lazy<IReadOnlyList<Type>>(FindAll, LazyThreadSafetyMode.ExecutionAndPublication);
         }
 
-        public IReadOnlyList<Type> Types => _types.Value;
+        public IReadOnlyList<Type> Types => this._types.Value;
 
         private IReadOnlyList<Type> FindAll()
         {
             var allTypes = new List<Type>();
 
-            foreach (var assembly in _assemblyFinder.Assemblies)
+            foreach (var assembly in this._assemblyFinder.Assemblies)
             {
                 try
                 {
@@ -40,6 +41,7 @@ namespace Volo.Abp.Reflection
                 catch (Exception ex)
                 {
                     //TODO: Trigger a global event?
+                    Debug.WriteLine(ex);
                 }
             }
 

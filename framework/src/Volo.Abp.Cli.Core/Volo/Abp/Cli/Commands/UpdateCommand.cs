@@ -21,21 +21,22 @@ namespace Volo.Abp.Cli.Commands
 
         public UpdateCommand(VoloNugetPackagesVersionUpdater nugetPackagesVersionUpdater, NpmPackagesUpdater npmPackagesUpdater)
         {
-            _nugetPackagesVersionUpdater = nugetPackagesVersionUpdater;
-            _npmPackagesUpdater = npmPackagesUpdater;
+            this._nugetPackagesVersionUpdater = nugetPackagesVersionUpdater;
+            this._npmPackagesUpdater = npmPackagesUpdater;
 
-            Logger = NullLogger<UpdateCommand>.Instance;
+            this.Logger = NullLogger<UpdateCommand>.Instance;
         }
 
         public async Task ExecuteAsync(CommandLineArgs commandLineArgs)
         {
             UpdateNugetPackages(commandLineArgs);
             UpdateNpmPackages();
+            await Task.CompletedTask;
         }
 
         private void UpdateNpmPackages()
         {
-            _npmPackagesUpdater.Update(Directory.GetCurrentDirectory());
+            this._npmPackagesUpdater.Update(Directory.GetCurrentDirectory());
         }
 
         private void UpdateNugetPackages(CommandLineArgs commandLineArgs)
@@ -49,9 +50,9 @@ namespace Volo.Abp.Cli.Commands
             {
                 var solutionName = Path.GetFileName(solution).RemovePostFix(".sln");
 
-                _nugetPackagesVersionUpdater.UpdateSolution(solution, includePreviews);
+                this._nugetPackagesVersionUpdater.UpdateSolution(solution, includePreviews);
 
-                Logger.LogInformation($"Volo packages are updated in {solutionName} solution.");
+                this.Logger.LogInformation($"Volo packages are updated in {solutionName} solution.");
                 return;
             }
 
@@ -61,9 +62,9 @@ namespace Volo.Abp.Cli.Commands
             {
                 var projectName = Path.GetFileName(project).RemovePostFix(".csproj");
 
-                _nugetPackagesVersionUpdater.UpdateProject(project, includePreviews);
+                this._nugetPackagesVersionUpdater.UpdateProject(project, includePreviews);
 
-                Logger.LogInformation($"Volo packages are updated in {projectName} project.");
+                this.Logger.LogInformation($"Volo packages are updated in {projectName} project.");
                 return;
             }
 

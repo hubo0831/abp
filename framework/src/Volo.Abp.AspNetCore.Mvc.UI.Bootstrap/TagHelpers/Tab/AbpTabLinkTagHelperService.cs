@@ -15,18 +15,19 @@ namespace Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Tab
 
             var tabHeaderItems = context.GetValue<List<TabItem>>(TabItems);
 
-            tabHeaderItems.Add(new TabItem(tabHeader, "", false, TagHelper.Name, TagHelper.ParentDropdownName, false));
+            tabHeaderItems.Add(new TabItem(tabHeader, "", false, this.TagHelper.Name, this.TagHelper.ParentDropdownName, false));
 
             output.SuppressOutput();
+            await Task.CompletedTask;
         }
 
         protected virtual string GetTabHeaderItem(TagHelperContext context, TagHelperOutput output)
         {
-            var id = TagHelper.Name + "-tab";
-            var href = TagHelper.Href;
-            var title = TagHelper.Title;
+            var id = this.TagHelper.Name + "-tab";
+            var href = this.TagHelper.Href;
+            var title = this.TagHelper.Title;
 
-            if (!string.IsNullOrWhiteSpace(TagHelper.ParentDropdownName))
+            if (!string.IsNullOrWhiteSpace(this.TagHelper.ParentDropdownName))
             {
                 return "<a class=\"dropdown-item\" id=\"" + id + "\" href=\"" + href + "\">" + title + "</a>";
             }
@@ -38,9 +39,9 @@ namespace Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Tab
 
         protected virtual void SetPlaceholderForNameIfNotProvided()
         {
-            if (string.IsNullOrWhiteSpace(TagHelper.Name))
+            if (string.IsNullOrWhiteSpace(this.TagHelper.Name))
             {
-                TagHelper.Name = TabItemNamePlaceHolder;
+                this.TagHelper.Name = TabItemNamePlaceHolder;
             }
         }
     }

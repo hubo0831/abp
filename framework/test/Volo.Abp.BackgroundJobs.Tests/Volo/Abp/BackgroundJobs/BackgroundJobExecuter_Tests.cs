@@ -10,7 +10,7 @@ namespace Volo.Abp.BackgroundJobs
 
         public BackgroundJobExecuter_Tests()
         {
-            _backgroundJobExecuter = GetRequiredService<IBackgroundJobExecuter>();
+            this._backgroundJobExecuter = GetRequiredService<IBackgroundJobExecuter>();
         }
 
         [Fact]
@@ -23,9 +23,9 @@ namespace Volo.Abp.BackgroundJobs
 
             //Act
 
-            _backgroundJobExecuter.Execute(
+            this._backgroundJobExecuter.Execute(
                 new JobExecutionContext(
-                    ServiceProvider,
+                    this.ServiceProvider,
                     typeof(MyJob),
                     new MyJobArgs("42")
                 )
@@ -34,6 +34,7 @@ namespace Volo.Abp.BackgroundJobs
             //Assert
 
             jobObject.ExecutedValues.ShouldContain("42");
+            await Task.CompletedTask;
         }
     }
 }

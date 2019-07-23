@@ -12,11 +12,11 @@ namespace Volo.Abp.Auditing
     public class AuditingInterceptor_Tests : AbpIntegratedTest<AuditingInterceptor_Tests.TestModule>
     {
         private IAuditingStore _auditingStore;
-        private IAuditingManager _auditingManager;
+        private readonly IAuditingManager _auditingManager;
 
         public AuditingInterceptor_Tests()
         {
-            _auditingManager = GetRequiredService<IAuditingManager>();
+            this._auditingManager = GetRequiredService<IAuditingManager>();
         }
 
         protected override void SetAbpApplicationCreationOptions(AbpApplicationCreationOptions options)
@@ -26,8 +26,8 @@ namespace Volo.Abp.Auditing
 
         protected override void AfterAddApplication(IServiceCollection services)
         {
-            _auditingStore = Substitute.For<IAuditingStore>();
-            services.Replace(ServiceDescriptor.Singleton(_auditingStore));
+            this._auditingStore = Substitute.For<IAuditingStore>();
+            services.Replace(ServiceDescriptor.Singleton(this._auditingStore));
         }
 
         [Fact]
@@ -35,14 +35,14 @@ namespace Volo.Abp.Auditing
         {
             var myAuditedObject1 = GetRequiredService<MyAuditedObject1>();
 
-            using (var scope = _auditingManager.BeginScope())
+            using (var scope = this._auditingManager.BeginScope())
             {
                 await myAuditedObject1.DoItAsync(new InputObject { Value1 = "forty-two", Value2 = 42 });
                 await scope.SaveAsync();
             }
 
 #pragma warning disable 4014
-            _auditingStore.Received().SaveAsync(Arg.Any<AuditLogInfo>());
+            this._auditingStore.Received().SaveAsync(Arg.Any<AuditLogInfo>());
 #pragma warning restore 4014
         }
 
@@ -67,11 +67,11 @@ namespace Volo.Abp.Auditing
         {
             public async virtual Task<ResultObject> DoItAsync(InputObject inputObject)
             {
-                return new ResultObject
+                return await Task.FromResult(new ResultObject
                 {
                     Value1 = inputObject.Value1 + "-result",
                     Value2 = inputObject.Value2 + 1
-                };
+                });
             }
         }
 

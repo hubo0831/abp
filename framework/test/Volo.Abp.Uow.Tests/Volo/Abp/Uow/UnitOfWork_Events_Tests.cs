@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
 using Xunit;
@@ -11,7 +12,7 @@ namespace Volo.Abp.Uow
 
         public UnitOfWork_Events_Tests()
         {
-            _unitOfWorkManager = ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
+            this._unitOfWorkManager = this.ServiceProvider.GetRequiredService<IUnitOfWorkManager>();
         }
 
         [Fact]
@@ -20,9 +21,13 @@ namespace Volo.Abp.Uow
             var completed = false;
             var disposed = false;
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (var uow = this._unitOfWorkManager.Begin())
             {
-                uow.OnCompleted(async () => completed = true);
+                uow.OnCompleted(async () =>
+                {
+                    completed = true;
+                    await Task.CompletedTask;
+                });
                 uow.Disposed += (sender, args) => disposed = true;
 
                 uow.Complete();
@@ -39,11 +44,15 @@ namespace Volo.Abp.Uow
             var completed = false;
             var disposed = false;
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (var uow = this._unitOfWorkManager.Begin())
             {
-                using (var childUow = _unitOfWorkManager.Begin())
+                using (var childUow = this._unitOfWorkManager.Begin())
                 {
-                    childUow.OnCompleted(async () => completed = true);
+                    childUow.OnCompleted(async () =>
+                    {
+                        completed = true;
+                        await Task.CompletedTask;
+                    });
                     uow.Disposed += (sender, args) => disposed = true;
 
                     childUow.Complete();
@@ -71,9 +80,13 @@ namespace Volo.Abp.Uow
             var failed = false;
             var disposed = false;
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (var uow = this._unitOfWorkManager.Begin())
             {
-                uow.OnCompleted(async () => completed = true);
+                uow.OnCompleted(async () =>
+                {
+                    completed = true;
+                    await Task.CompletedTask;
+                });
                 uow.Failed += (sender, args) => failed = true;
                 uow.Disposed += (sender, args) => disposed = true;
             }
@@ -92,9 +105,13 @@ namespace Volo.Abp.Uow
 
             Assert.Throws<Exception>(new Action(() =>
             {
-                using (var uow = _unitOfWorkManager.Begin())
+                using (var uow = this._unitOfWorkManager.Begin())
                 {
-                    uow.OnCompleted(async () => completed = true);
+                    uow.OnCompleted(async () =>
+                    {
+                        completed = true;
+                        await Task.CompletedTask;
+                    });
                     uow.Failed += (sender, args) => failed = true;
                     uow.Disposed += (sender, args) => disposed = true;
 
@@ -116,9 +133,13 @@ namespace Volo.Abp.Uow
             var failed = false;
             var disposed = false;
 
-            using (var uow = _unitOfWorkManager.Begin())
+            using (var uow = this._unitOfWorkManager.Begin())
             {
-                uow.OnCompleted(async () => completed = true);
+                uow.OnCompleted(async () =>
+                {
+                    completed = true;
+                    await Task.CompletedTask;
+                });
                 uow.Failed += (sender, args) => { failed = true; args.IsRolledback.ShouldBeTrue(); };
                 uow.Disposed += (sender, args) => disposed = true;
 

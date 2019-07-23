@@ -52,7 +52,7 @@ namespace Volo.Abp.Caching
                 async () =>
                 {
                     factoryExecuted = true;
-                    return new PersonCacheItem(personName);
+                    return await Task.FromResult(new PersonCacheItem(personName));
                 });
 
             factoryExecuted.ShouldBeTrue();
@@ -66,7 +66,7 @@ namespace Volo.Abp.Caching
                 async () =>
                 {
                     factoryExecuted = true;
-                    return new PersonCacheItem(personName);
+                    return await Task.FromResult(new PersonCacheItem(personName));
                 });
 
             factoryExecuted.ShouldBeFalse();

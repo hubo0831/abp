@@ -66,6 +66,7 @@ namespace Volo.Abp.Cli.ProjectModification
                 ModuleClassDependcyAdder.Add(moduleFiles.First(), package.ModuleClass);
 
                 Logger.LogInformation("Successfully installed.");
+                await Task.CompletedTask;
             }
         }
 
