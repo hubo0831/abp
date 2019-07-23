@@ -65,6 +65,8 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
+            //因为使用最外层保留的UOW，所以生成一个默认选项
+            Options = _defaultOptions.Normalize(new UnitOfWorkOptions());
             ReservationName = reservationName;
             IsReserved = true;
         }

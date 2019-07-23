@@ -1,5 +1,7 @@
 # COMMON PATHS
 
+Set-Location "D:\My Documents\Projects\abp"
+
 $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 
 # List of solutions
@@ -30,7 +32,7 @@ $outputFolder = Join-Path $rootFolder "lib"
 foreach ($solutionPath in $solutionPaths) {    
     $solutionAbsPath = (Join-Path $rootFolder $solutionPath)
     Set-Location $solutionAbsPath
-    dotnet build -c Release -o "$outputFolder"
+    dotnet build -c Release -o "$outputFolder" --no-restore
     if (-Not $?) {
         Write-Host ("Build failed for the solution: " + $solutionPath)
         #Set-Location $rootFolder
@@ -47,5 +49,9 @@ Remove-Item "System.*"
 Remove-Item "xunit.*"
 Remove-Item "*.json"
 Remove-Item "*.config"
+Remove-Item "*.TestBase.dll"
+Remove-Item "*.TestBase.pdb"
 Remove-Item "*.Tests.dll"
 Remove-Item "*.Tests.pdb"
+Remove-Item "*.DemoApp.dll"
+Remove-Item "*.DemoApp.pdb"

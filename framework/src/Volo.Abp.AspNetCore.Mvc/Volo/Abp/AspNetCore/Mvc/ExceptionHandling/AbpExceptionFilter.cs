@@ -77,9 +77,11 @@ namespace Volo.Abp.AspNetCore.Mvc.ExceptionHandling
 
             var logLevel = context.Exception.GetLogLevel();
 
-            Logger.LogWithLevel(logLevel, $"---------- {nameof(RemoteServiceErrorInfo)} ----------");
-            Logger.LogWithLevel(logLevel, _jsonSerializer.Serialize(remoteServiceErrorInfo, indented: true));
-            Logger.LogException(context.Exception, logLevel);
+            //Logger.LogWithLevel(logLevel, $"---------- {nameof(RemoteServiceErrorInfo)} ----------");
+            //Logger.LogWithLevel(logLevel, _jsonSerializer.Serialize(remoteServiceErrorInfo, indented: true));
+            //Logger.LogException(context.Exception, logLevel);
+            Logger.LogKnownProperties(context.Exception);
+            Logger.LogWithLevel(logLevel, context.Exception.Message, context.Exception);
 
             context.Exception = null; //Handled!
         }

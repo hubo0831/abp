@@ -80,6 +80,18 @@ namespace Microsoft.Extensions.Logging
             }
         }
 
+        public static void LogKnownProperties(this ILogger logger, Exception exception)
+        {
+            if (exception is IHasErrorCode exceptionWithErrorCode)
+            {
+                exception.Data["Code"] = exceptionWithErrorCode.Code;
+            }
+
+            if (exception is IHasErrorDetails exceptionWithErrorDetails)
+            {
+                exception.Data["Details"] = exceptionWithErrorDetails.Details;
+            }
+        }
         private static void LogData(ILogger logger, Exception exception, LogLevel logLevel)
         {
             if (exception.Data == null || exception.Data.Count <= 0)

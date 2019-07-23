@@ -8,10 +8,13 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 using Newtonsoft.Json;
 using Volo.Abp.Auditing;
 using Volo.Abp.Data;
@@ -51,6 +54,8 @@ namespace Volo.Abp.EntityFrameworkCore
 
         public ILogger<AbpDbContext<TDbContext>> Logger { get; set; }
 
+        private AbpDbContextOptions AbpDbContextOptions { get; set; }
+
         private static readonly MethodInfo ConfigureBasePropertiesMethodInfo
             = typeof(AbpDbContext<TDbContext>)
                 .GetMethod(
@@ -70,6 +75,9 @@ namespace Volo.Abp.EntityFrameworkCore
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+
+            var sp = this.As<IInfrastructure<IServiceProvider>>().Instance;
+            this.AbpDbContextOptions = sp.GetRequiredService<IOptions<AbpDbContextOptions>>().Value;
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
@@ -418,7 +426,8 @@ namespace Volo.Abp.EntityFrameworkCore
                     b.Property(x => ((ISoftDelete) x).IsDeleted)
                         .IsRequired()
                         .HasDefaultValue(false)
-                        .HasColumnName(nameof(ISoftDelete.IsDeleted));
+                        .HasColumnName(nameof(ISoftDelete.IsDeleted))
+                        .ValueGeneratedNever(); //有些实体的值生成方式变为添加时自动生成(SQLServer)
                 });
             }
 
@@ -474,12 +483,13 @@ namespace Volo.Abp.EntityFrameworkCore
 
         protected virtual bool ShouldFilterEntity<TEntity>(IMutableEntityType entityType) where TEntity : class
         {
-            if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)))
+            var entityType2 = typeof(TEntity);
+            if (typeof(IMultiTenant).IsAssignableFrom(entityType2) && !this.AbpDbContextOptions.IsMultiTenantTypeIgnored(entityType2))
             {
                 return true;
             }
 
-            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
+            if (typeof(ISoftDelete).IsAssignableFrom(entityType2))
             {
                 return true;
             }
@@ -490,9 +500,10 @@ namespace Volo.Abp.EntityFrameworkCore
         protected virtual Expression<Func<TEntity, bool>> CreateFilterExpression<TEntity>()
             where TEntity : class
         {
+            var entityType = typeof(TEntity);
             Expression<Func<TEntity, bool>> expression = null;
 
-            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)))
+            if (typeof(ISoftDelete).IsAssignableFrom(entityType))
             {
                 /* This condition should normally be defined as below:
                  * !IsSoftDeleteFilterEnabled || !((ISoftDelete) e).IsDeleted
@@ -504,7 +515,7 @@ namespace Volo.Abp.EntityFrameworkCore
                 expression = expression == null ? softDeleteFilter : CombineExpressions(expression, softDeleteFilter);
             }
 
-            if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)))
+            if (typeof(IMultiTenant).IsAssignableFrom(entityType) && !this.AbpDbContextOptions.IsMultiTenantTypeIgnored(entityType))
             {
                 /* This condition should normally be defined as below:
                  * !IsMayHaveTenantFilterEnabled || ((IMayHaveTenant)e).TenantId == CurrentTenantId

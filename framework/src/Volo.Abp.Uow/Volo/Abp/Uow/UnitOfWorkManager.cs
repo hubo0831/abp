@@ -12,7 +12,7 @@ namespace Volo.Abp.Uow
         private readonly IAmbientUnitOfWork _ambientUnitOfWork;
 
         public UnitOfWorkManager(
-            IServiceProvider serviceProvider, 
+            IServiceProvider serviceProvider,
             IAmbientUnitOfWork ambientUnitOfWork)
         {
             _serviceProvider = serviceProvider;
@@ -39,7 +39,7 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
-            if (!requiresNew && 
+            if (!requiresNew &&
                 _ambientUnitOfWork.UnitOfWork != null &&
                 _ambientUnitOfWork.UnitOfWork.IsReservedFor(reservationName))
             {
@@ -89,6 +89,8 @@ namespace Volo.Abp.Uow
             //Skip reserved unit of work
             while (uow != null && (uow.IsReserved || uow.IsDisposed || uow.IsCompleted))
             {
+                //使用最外层保留的UOW
+                if (uow.Outer == null && uow.IsReserved) break;
                 uow = uow.Outer;
             }
 

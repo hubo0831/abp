@@ -33,5 +33,17 @@ namespace Volo.Abp.AutoMapper
                 ValidatingProfiles.Add<TProfile>();
             }
         }
+        /// <summary>加入Profile实例</summary>
+        public void AddProfile(Profile profile, bool validate = false)
+        {
+            Configurators.Add(context =>
+            {
+                context.MapperConfiguration.AddProfile(profile);
+            });
+            if (validate)
+            {
+                ValidatingProfiles.Add(profile.GetType());
+            }
+        }
     }
 }

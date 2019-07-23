@@ -12,7 +12,7 @@ namespace Volo.Abp.Domain.Repositories
     public abstract class BasicRepositoryBase<TEntity> : 
         IBasicRepository<TEntity>, 
         IServiceProviderAccessor,
-        IUnitOfWorkEnabled,
+        //IUnitOfWorkEnabled, 取消UOW操作，太影响性能，但其所有操作必须显式使用[UnitOfWork]包裹
         ITransientDependency
         where TEntity : class, IEntity
     {

@@ -15,6 +15,8 @@ namespace Volo.Abp.EntityFrameworkCore
 
         internal Dictionary<Type, object> ConfigureActions { get; set; }
 
+        internal List<Type> MultiTenantTypesIgnored { get; set; }
+
         public AbpDbContextOptions()
         {
             DefaultPreConfigureActions = new List<Action<AbpDbContextConfigurationContext>>();
@@ -50,12 +52,27 @@ namespace Volo.Abp.EntityFrameworkCore
             actions.Add(action);
         }
 
-        public void Configure<TDbContext>([NotNull] Action<AbpDbContextConfigurationContext<TDbContext>> action) 
+        public void Configure<TDbContext>([NotNull] Action<AbpDbContextConfigurationContext<TDbContext>> action)
             where TDbContext : AbpDbContext<TDbContext>
         {
             Check.NotNull(action, nameof(action));
 
             ConfigureActions[typeof(TDbContext)] = action;
+        }
+        public void IgnoreMultiTenantType<TEntity>()
+        {
+            if (this.MultiTenantTypesIgnored == null)
+            {
+                this.MultiTenantTypesIgnored = new List<Type>();
+            }
+            this.MultiTenantTypesIgnored.Add(typeof(TEntity));
+        }
+        public bool IsMultiTenantTypeIgnored(Type entityType)
+        {
+            Check.NotNull(entityType, nameof(entityType));
+
+            if (this.MultiTenantTypesIgnored == null) return false;
+            return this.MultiTenantTypesIgnored.Contains(entityType);
         }
     }
 }
