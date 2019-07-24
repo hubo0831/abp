@@ -146,7 +146,7 @@ namespace Volo.Abp.Account.Web.Pages.Account
             var properties = SignInManager.ConfigureExternalAuthenticationProperties(provider, redirectUrl);
             properties.Items["scheme"] = provider;
 
-            return Challenge(properties, provider);
+            return await Task.FromResult(Challenge(properties, provider));
         }
 
         [UnitOfWork]

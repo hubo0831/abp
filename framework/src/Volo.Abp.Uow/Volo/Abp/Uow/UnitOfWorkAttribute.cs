@@ -37,6 +37,11 @@ namespace Volo.Abp.Uow
         /// </summary>
         public bool IsDisabled { get; set; }
 
+        /// <summary>
+        /// Used to create a new unit of work , not a child unit of work 
+        /// </summary>
+        public bool RequiresNew { get; set; }
+
         public UnitOfWorkAttribute()
         {
             

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Threading;
@@ -34,6 +35,7 @@ namespace Volo.Abp.Uow
         private readonly Dictionary<string, IDatabaseApi> _databaseApis;
         private readonly Dictionary<string, ITransactionApi> _transactionApis;
         private readonly UnitOfWorkDefaultOptions _defaultOptions;
+        private TransactionScope _contextTransactionScope;
 
         private Exception _exception;
         private bool _isCompleting;
@@ -57,6 +59,8 @@ namespace Volo.Abp.Uow
                 throw new AbpException("This unit of work is already initialized before!");
             }
 
+            if (options.IsTransactional) BeginTransactionScope(options);
+
             Options = _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
         }
@@ -65,10 +69,30 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
-            //因为使用最外层保留的UOW，所以生成一个默认选项
-            Options = _defaultOptions.Normalize(new UnitOfWorkOptions());
             ReservationName = reservationName;
             IsReserved = true;
+        }
+
+        private void BeginTransactionScope(UnitOfWorkOptions options)
+        {
+            options.IsTransactional = false;
+            var transactionOptions = new TransactionOptions();
+            if (options.Timeout.HasValue) transactionOptions.Timeout = options.Timeout.Value;
+            if (options.IsolationLevel.HasValue) transactionOptions.IsolationLevel = GetIsolationLevel(options.IsolationLevel.Value);
+            _contextTransactionScope = new TransactionScope(TransactionScopeOption.Required, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
+        }
+        private IsolationLevel GetIsolationLevel(System.Data.IsolationLevel isolationLevel)
+        {
+            switch (isolationLevel)
+            {
+                case System.Data.IsolationLevel.ReadCommitted: return IsolationLevel.ReadCommitted;
+                case System.Data.IsolationLevel.Serializable: return IsolationLevel.Serializable;
+                case System.Data.IsolationLevel.Snapshot: return IsolationLevel.Snapshot;
+                case System.Data.IsolationLevel.RepeatableRead: return IsolationLevel.RepeatableRead;
+                case System.Data.IsolationLevel.ReadUncommitted: return IsolationLevel.ReadUncommitted;
+                case System.Data.IsolationLevel.Chaos: return IsolationLevel.Chaos;
+                default: return IsolationLevel.Unspecified;
+            }
         }
 
         public virtual void SetOuter(IUnitOfWork outer)
@@ -284,10 +308,13 @@ namespace Volo.Abp.Uow
                 {
                     transactionApi.Dispose();
                 }
-                catch
-                {
-                }
+                catch { }
             }
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
         }
 
         private void PreventMultipleComplete()
@@ -317,6 +344,11 @@ namespace Volo.Abp.Uow
                 }
                 catch { }
             }
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
         }
 
         protected virtual async Task RollbackAllAsync(CancellationToken cancellationToken)
@@ -344,6 +376,11 @@ namespace Volo.Abp.Uow
                     catch { }
                 }
             }
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
         }
 
         protected virtual void CommitTransactions()
@@ -352,6 +389,7 @@ namespace Volo.Abp.Uow
             {
                 transaction.Commit();
             }
+            _contextTransactionScope?.Complete();
         }
 
         protected virtual async Task CommitTransactionsAsync()
@@ -360,6 +398,7 @@ namespace Volo.Abp.Uow
             {
                 await transaction.CommitAsync();
             }
+            _contextTransactionScope?.Complete();
         }
 
         public override string ToString()

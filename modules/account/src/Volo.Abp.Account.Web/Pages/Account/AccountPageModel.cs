@@ -14,7 +14,7 @@ namespace Volo.Abp.Account.Web.Pages.Account
     {
         public SignInManager<IdentityUser> SignInManager { get; set; }
         public IdentityUserManager UserManager { get; set; }
-        public IStringLocalizer<AccountResource> L { get; set; }
+        //public IStringLocalizer<AccountResource> L { get; set; }
 
         protected RedirectResult RedirectSafely(string returnUrl, string returnUrlHash = null)
         {

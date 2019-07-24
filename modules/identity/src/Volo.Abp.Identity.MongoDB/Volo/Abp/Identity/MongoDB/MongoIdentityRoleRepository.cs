@@ -44,7 +44,7 @@ namespace Volo.Abp.Identity.MongoDB
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
-        public async Task<long> GetCountAsync(CancellationToken cancellationToken = default)
+        public override async Task<long> GetCountAsync(CancellationToken cancellationToken = default)
         {
             return await GetMongoQueryable()
                 .LongCountAsync(GetCancellationToken(cancellationToken));

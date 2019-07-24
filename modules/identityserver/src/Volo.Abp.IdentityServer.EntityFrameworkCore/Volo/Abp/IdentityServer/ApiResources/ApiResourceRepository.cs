@@ -52,7 +52,7 @@ namespace Volo.Abp.IdentityServer.ApiResources
                 .ToListAsync(GetCancellationToken(cancellationToken));
         }
 
-        public virtual async Task<List<ApiResource>> GetListAsync(
+        public override async Task<List<ApiResource>> GetListAsync(
             bool includeDetails = false,
             CancellationToken cancellationToken = default)
         {

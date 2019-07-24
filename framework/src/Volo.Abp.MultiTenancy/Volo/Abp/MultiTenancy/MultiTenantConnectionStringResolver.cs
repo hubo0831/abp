@@ -27,7 +27,7 @@ namespace Volo.Abp.MultiTenancy
         public override string Resolve(string connectionStringName = null)
         {
             //No current tenant, fallback to default logic
-            if (_currentTenant.Id == null)
+            if (_currentTenant.Id == null || !Options.UseDatabasePerTenant)
             {
                 return base.Resolve(connectionStringName);
             }
