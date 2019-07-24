@@ -69,6 +69,7 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
+            Options = _defaultOptions.Normalize(new UnitOfWorkOptions());
             ReservationName = reservationName;
             IsReserved = true;
         }

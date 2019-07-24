@@ -54,7 +54,9 @@ namespace Volo.Abp.EntityFrameworkCore
 
         public ILogger<AbpDbContext<TDbContext>> Logger { get; set; }
 
-        private AbpDbContextOptions AbpDbContextOptions { get; set; }
+        public IOptions<AbpDbContextOptions> AbpDbContextOptionsWrapper { get; set; }
+
+        private AbpDbContextOptions AbpDbContextOptions => AbpDbContextOptionsWrapper.Value;
 
         private static readonly MethodInfo ConfigureBasePropertiesMethodInfo
             = typeof(AbpDbContext<TDbContext>)
@@ -75,9 +77,6 @@ namespace Volo.Abp.EntityFrameworkCore
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-
-            var sp = this.As<IInfrastructure<IServiceProvider>>().Instance;
-            this.AbpDbContextOptions = sp.GetRequiredService<IOptions<AbpDbContextOptions>>().Value;
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
