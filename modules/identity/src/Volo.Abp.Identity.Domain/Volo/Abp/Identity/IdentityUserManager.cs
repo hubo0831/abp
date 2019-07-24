@@ -43,7 +43,7 @@ namespace Volo.Abp.Identity
             _cancellationTokenProvider = cancellationTokenProvider;
         }
 
-        public async Task<IdentityUser> GetByIdAsync(Guid id)
+        public virtual async Task<IdentityUser> GetByIdAsync(Guid id)
         {
             var user = await Store.FindByIdAsync(id.ToString(), CancellationToken);
             if (user == null)
