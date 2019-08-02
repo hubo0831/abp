@@ -1,12 +1,21 @@
 ﻿using System.Collections.Generic;
+
 using JetBrains.Annotations;
+
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Volo.Abp.Modularity
 {
     public class ServiceConfigurationContext
     {
         public IServiceCollection Services { get; }
+
+        /// <summary>默认配置</summary>
+        public IConfiguration DefaultConfiguration { get; set; }
+        /// <summary>获得默认主机环境</summary>
+        public IHostingEnvironment DefaultHostingEnvironment { get; set; }
 
         public IDictionary<string, object> Items { get; }
 
@@ -28,6 +37,8 @@ namespace Volo.Abp.Modularity
         public ServiceConfigurationContext([NotNull] IServiceCollection services)
         {
             Services = Check.NotNull(services, nameof(services));
+            DefaultConfiguration = services.GetSingletonInstance<IConfiguration>();
+            DefaultHostingEnvironment = services.GetSingletonInstance<IHostingEnvironment>();
             Items = new Dictionary<string, object>();
         }
     }
