@@ -7,6 +7,9 @@ namespace Volo.Abp.EntityFrameworkCore.SqlServer
         )]
     public class AbpEntityFrameworkCoreSqlServerModule : AbpModule
     {
-
+        /// <summary>配置服务</summary>
+        public override void ConfigureServices(ServiceConfigurationContext context)
+        {
+        }
     }
 }

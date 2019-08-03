@@ -13,8 +13,11 @@ namespace Volo.Abp
         [NotNull]
         public PlugInSourceList PlugInSources { get; }
 
+        /// <summary>是否使用系统自带的配置</summary>
+        public bool UseDefaultConfiguration { get; set; }
+
         [NotNull]
-        public ConfigurationBuilderOptions Configuration {get; }
+        public ConfigurationBuilderOptions Configuration { get; }
 
         public AbpApplicationCreationOptions([NotNull] IServiceCollection services)
         {

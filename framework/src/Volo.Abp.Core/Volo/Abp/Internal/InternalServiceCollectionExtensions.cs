@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using System;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Volo.Abp.Configuration;
@@ -17,19 +18,24 @@ namespace Volo.Abp.Internal
         }
 
         internal static void AddCoreAbpServices(this IServiceCollection services,
-            IAbpApplication abpApplication, 
+            IAbpApplication abpApplication,
             AbpApplicationCreationOptions applicationCreationOptions)
         {
             var moduleLoader = new ModuleLoader();
             var assemblyFinder = new AssemblyFinder(abpApplication);
             var typeFinder = new TypeFinder(assemblyFinder);
 
+            IConfigurationRoot configuration;
+            if (applicationCreationOptions.UseDefaultConfiguration)
+            {
+                configuration = services.GetSingletonInstance<IConfiguration>().As<IConfigurationRoot>();
+            }
+            else
+            {
+                configuration = ConfigurationHelper.BuildConfiguration(applicationCreationOptions.Configuration);
+            }
             services.TryAddSingleton<IConfigurationAccessor>(
-                new DefaultConfigurationAccessor(
-                    ConfigurationHelper.BuildConfiguration(
-                        applicationCreationOptions.Configuration
-                    )
-                )
+                new DefaultConfigurationAccessor(configuration)
             );
 
             services.TryAddSingleton<IModuleLoader>(moduleLoader);
