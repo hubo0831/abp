@@ -1,29 +1,34 @@
-﻿
+﻿using System;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.SqlServer.Infrastructure.Internal;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
-
-using Volo.Abp.Data;
 
 namespace Volo.Abp.EntityFrameworkCore.SqlServer
 {
+    [Obsolete]
     public class AbpSqlServerOptionsExtension : SqlServerOptionsExtension
     {
-        public AbpSqlServerOptionsExtension(DbConnectionOptions dbConnectionOptions)
+        public AbpSqlServerOptionsExtension()
         {
-            this.DbConnectionOptions = dbConnectionOptions;
+            this.ReplaceServices = new ServiceCollection();
         }
-
-        public DbConnectionOptions DbConnectionOptions { get; }
-
+        protected AbpSqlServerOptionsExtension(AbpSqlServerOptionsExtension copyFrom) : base(copyFrom)
+        {
+            this.ReplaceServices = copyFrom.ReplaceServices;
+        }
+        public IServiceCollection ReplaceServices { get; }
         public override bool ApplyServices(IServiceCollection services)
         {
-            new EntityFrameworkRelationalServicesBuilder(services)
-                .TryAdd<DbConnectionOptions>(this.DbConnectionOptions)
-                .TryAdd<IRelationalDatabaseCreator, AbpSqlServerDatabaseCreator>();
-            base.ApplyServices(services);
-            return true;
+            foreach (ServiceDescriptor descriptor in this.ReplaceServices)
+            {
+                services.Add(descriptor);
+            }
+            this.ReplaceServices.Clear();
+            return base.ApplyServices(services);
+        }
+        protected override RelationalOptionsExtension Clone()
+        {
+            return new AbpSqlServerOptionsExtension(this);
         }
     }
 }
