@@ -10,6 +10,11 @@ namespace Volo.Abp.Uow
         /// </summary>
         public bool IsTransactional { get; set; }
 
+        /// <summary>
+        /// Is this UOW use TransactionScope?
+        /// </summary>
+        public bool UseTransactionScope { get; set; }
+
         public IsolationLevel? IsolationLevel { get; set; }
 
         public TimeSpan? Timeout { get; set; }
@@ -19,6 +24,7 @@ namespace Volo.Abp.Uow
             return new UnitOfWorkOptions
             {
                 IsTransactional = IsTransactional,
+                UseTransactionScope = UseTransactionScope,
                 IsolationLevel = IsolationLevel,
                 Timeout = Timeout
             };

@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Transactions;
 using JetBrains.Annotations;
 
 namespace Volo.Abp.Uow
@@ -28,7 +29,9 @@ namespace Volo.Abp.Uow
 
         private readonly IUnitOfWork _parent;
 
-        public ChildUnitOfWork([NotNull] IUnitOfWork parent)
+        private TransactionScope _contextTransactionScope;
+
+        public ChildUnitOfWork([NotNull] IUnitOfWork parent, IUnitOfWorkOptions options = null)
         {
             Check.NotNull(parent, nameof(parent));
 
@@ -36,6 +39,11 @@ namespace Volo.Abp.Uow
 
             _parent.Failed += (sender, args) => { Failed.InvokeSafely(sender, args); };
             _parent.Disposed += (sender, args) => { Disposed.InvokeSafely(sender, args); };
+
+            if (options != null && options.UseTransactionScope)
+            {
+                _contextTransactionScope = this.BeginUowTransactionScope(options);
+            }
         }
 
         public void SetOuter(IUnitOfWork outer)
@@ -63,23 +71,46 @@ namespace Volo.Abp.Uow
             return _parent.SaveChangesAsync(cancellationToken);
         }
 
-        public void Complete()
+        private void CommitTransactionScope()
         {
-
+            _contextTransactionScope?.Complete();
         }
 
-        public Task CompleteAsync(CancellationToken cancellationToken = default)
+        public void Complete()
         {
-            return Task.CompletedTask;
+            if (_contextTransactionScope != null)
+            {
+                SaveChanges();
+                CommitTransactionScope();
+            }
+        }
+
+        public async Task CompleteAsync(CancellationToken cancellationToken = default)
+        {
+            if (_contextTransactionScope != null)
+            {
+                await SaveChangesAsync(cancellationToken);
+                CommitTransactionScope();
+            }
         }
 
         public void Rollback()
         {
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
             _parent.Rollback();
         }
 
         public Task RollbackAsync(CancellationToken cancellationToken = default)
         {
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
             return _parent.RollbackAsync(cancellationToken);
         }
 
@@ -120,7 +151,13 @@ namespace Volo.Abp.Uow
 
         public void Dispose()
         {
-
+            if (_contextTransactionScope == null) return;
+            try
+            {
+                _contextTransactionScope?.Dispose();
+            }
+            catch { }
+            _contextTransactionScope = null;
         }
 
         public override string ToString()

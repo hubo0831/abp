@@ -26,7 +26,7 @@ namespace Volo.Abp.Uow
             var currentUow = Current;
             if (currentUow != null && !requiresNew)
             {
-                return new ChildUnitOfWork(currentUow);
+                return new ChildUnitOfWork(currentUow, options);
             }
 
             var unitOfWork = CreateNewUnitOfWork();

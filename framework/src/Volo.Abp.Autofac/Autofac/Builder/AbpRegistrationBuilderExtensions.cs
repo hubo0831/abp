@@ -5,6 +5,7 @@ using Autofac.Core;
 using Autofac.Extras.DynamicProxy;
 using Volo.Abp.Castle.DynamicProxy;
 using Volo.Abp.DependencyInjection;
+using Volo.Abp.DynamicProxy;
 using Volo.Abp.Modularity;
 
 namespace Autofac.Builder
@@ -12,8 +13,8 @@ namespace Autofac.Builder
     public static class AbpRegistrationBuilderExtensions
     {
         public static IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> ConfigureAbpConventions<TLimit, TActivatorData, TRegistrationStyle>(
-                this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, 
-                IModuleContainer moduleContainer, 
+                this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder,
+                IModuleContainer moduleContainer,
                 ServiceRegistrationActionList registrationActionList)
             where TActivatorData : ReflectionActivatorData
         {
@@ -35,7 +36,7 @@ namespace Autofac.Builder
             return registrationBuilder;
         }
 
-        private static IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InvokeRegistrationActions<TLimit, TActivatorData, TRegistrationStyle>(this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, ServiceRegistrationActionList registrationActionList, Type serviceType, Type implementationType) 
+        private static IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> InvokeRegistrationActions<TLimit, TActivatorData, TRegistrationStyle>(this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, ServiceRegistrationActionList registrationActionList, Type serviceType, Type implementationType)
             where TActivatorData : ReflectionActivatorData
         {
             var serviceRegistredArgs = new OnServiceRegistredContext(serviceType, implementationType);
@@ -57,9 +58,9 @@ namespace Autofac.Builder
         }
 
         private static IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> EnablePropertyInjection<TLimit, TActivatorData, TRegistrationStyle>(
-                this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, 
+                this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder,
                 IModuleContainer moduleContainer,
-                Type implementationType) 
+                Type implementationType)
             where TActivatorData : ReflectionActivatorData
         {
             //Enable Property Injection only for types in an assembly containing an AbpModule
@@ -72,7 +73,7 @@ namespace Autofac.Builder
         }
 
         private static IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> AddInterceptors<TLimit, TActivatorData, TRegistrationStyle>(
-            this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder, 
+            this IRegistrationBuilder<TLimit, TActivatorData, TRegistrationStyle> registrationBuilder,
             Type serviceType,
             IEnumerable<Type> interceptors)
             where TActivatorData : ReflectionActivatorData

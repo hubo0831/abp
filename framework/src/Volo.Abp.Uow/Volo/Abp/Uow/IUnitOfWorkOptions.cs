@@ -7,6 +7,8 @@ namespace Volo.Abp.Uow
     {
         bool IsTransactional { get; }
 
+        bool UseTransactionScope { get; }
+
         IsolationLevel? IsolationLevel { get; }
 
         TimeSpan? Timeout { get; }

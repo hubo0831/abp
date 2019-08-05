@@ -59,7 +59,7 @@ namespace Volo.Abp.Uow
                 throw new AbpException("This unit of work is already initialized before!");
             }
 
-            if (options.IsTransactional) BeginTransactionScope(options);
+            if (options.UseTransactionScope) BeginTransactionScope(options);
 
             Options = _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
@@ -74,26 +74,9 @@ namespace Volo.Abp.Uow
             IsReserved = true;
         }
 
-        private void BeginTransactionScope(UnitOfWorkOptions options)
+        protected virtual void BeginTransactionScope(IUnitOfWorkOptions options = null)
         {
-            options.IsTransactional = false;
-            var transactionOptions = new TransactionOptions();
-            if (options.Timeout.HasValue) transactionOptions.Timeout = options.Timeout.Value;
-            if (options.IsolationLevel.HasValue) transactionOptions.IsolationLevel = GetIsolationLevel(options.IsolationLevel.Value);
-            _contextTransactionScope = new TransactionScope(TransactionScopeOption.Required, transactionOptions, TransactionScopeAsyncFlowOption.Enabled);
-        }
-        private IsolationLevel GetIsolationLevel(System.Data.IsolationLevel isolationLevel)
-        {
-            switch (isolationLevel)
-            {
-                case System.Data.IsolationLevel.ReadCommitted: return IsolationLevel.ReadCommitted;
-                case System.Data.IsolationLevel.Serializable: return IsolationLevel.Serializable;
-                case System.Data.IsolationLevel.Snapshot: return IsolationLevel.Snapshot;
-                case System.Data.IsolationLevel.RepeatableRead: return IsolationLevel.RepeatableRead;
-                case System.Data.IsolationLevel.ReadUncommitted: return IsolationLevel.ReadUncommitted;
-                case System.Data.IsolationLevel.Chaos: return IsolationLevel.Chaos;
-                default: return IsolationLevel.Unspecified;
-            }
+            _contextTransactionScope = this.BeginUowTransactionScope(options ?? this.Options);
         }
 
         public virtual void SetOuter(IUnitOfWork outer)
@@ -384,22 +367,27 @@ namespace Volo.Abp.Uow
             catch { }
         }
 
+        protected virtual void CommitTransactionScope()
+        {
+            _contextTransactionScope?.Complete();
+        }
+
         protected virtual void CommitTransactions()
         {
             foreach (var transaction in _transactionApis.Values)
             {
                 transaction.Commit();
             }
-            _contextTransactionScope?.Complete();
+            CommitTransactionScope();
         }
 
-        protected virtual async Task CommitTransactionsAsync()
+        protected virtual async Task CommitTransactionsAsync(CancellationToken cancellationToken = default)
         {
             foreach (var transaction in _transactionApis.Values)
             {
                 await transaction.CommitAsync();
             }
-            _contextTransactionScope?.Complete();
+            CommitTransactionScope();
         }
 
         public override string ToString()
