@@ -1,5 +1,6 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 
 namespace Volo.Abp.Uow
@@ -10,13 +11,16 @@ namespace Volo.Abp.Uow
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IAmbientUnitOfWork _ambientUnitOfWork;
+        private readonly UnitOfWorkDefaultOptions _defaultOptions;
 
         public UnitOfWorkManager(
             IServiceProvider serviceProvider,
-            IAmbientUnitOfWork ambientUnitOfWork)
+            IAmbientUnitOfWork ambientUnitOfWork,
+            IOptions<UnitOfWorkDefaultOptions> options)
         {
             _serviceProvider = serviceProvider;
             _ambientUnitOfWork = ambientUnitOfWork;
+            _defaultOptions = options.Value;
         }
 
         public IUnitOfWork Begin(UnitOfWorkOptions options, bool requiresNew = false)
@@ -24,6 +28,7 @@ namespace Volo.Abp.Uow
             Check.NotNull(options, nameof(options));
 
             var currentUow = Current;
+            options = _defaultOptions.Normalize(options.Clone());
             if (currentUow != null && !requiresNew)
             {
                 return new ChildUnitOfWork(currentUow, options);
@@ -39,15 +44,16 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
+            var options = _defaultOptions.Normalize(new UnitOfWorkOptions());
             if (!requiresNew &&
                 _ambientUnitOfWork.UnitOfWork != null &&
                 _ambientUnitOfWork.UnitOfWork.IsReservedFor(reservationName))
             {
-                return new ChildUnitOfWork(_ambientUnitOfWork.UnitOfWork);
+                return new ChildUnitOfWork(_ambientUnitOfWork.UnitOfWork, options);
             }
 
             var unitOfWork = CreateNewUnitOfWork();
-            unitOfWork.Reserve(reservationName);
+            unitOfWork.Reserve(reservationName, options);
 
             return unitOfWork;
         }
@@ -77,6 +83,7 @@ namespace Volo.Abp.Uow
                 return false;
             }
 
+            options = _defaultOptions.Normalize(options.Clone());
             uow.Initialize(options);
 
             return true;

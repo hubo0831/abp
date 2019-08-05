@@ -30,7 +30,7 @@ namespace Volo.Abp.Uow
 
         void Initialize([NotNull] UnitOfWorkOptions options);
 
-        void Reserve([NotNull] string reservationName);
+        void Reserve([NotNull] string reservationName, [NotNull] UnitOfWorkOptions options);
 
         void SaveChanges();
 

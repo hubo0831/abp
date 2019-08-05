@@ -56,9 +56,9 @@ namespace Volo.Abp.Uow
             _parent.Initialize(options);
         }
 
-        public void Reserve(string reservationName)
+        public void Reserve(string reservationName, UnitOfWorkOptions options)
         {
-            _parent.Reserve(reservationName);
+            _parent.Reserve(reservationName, options);
         }
 
         public void SaveChanges()

@@ -34,17 +34,17 @@ namespace Volo.Abp.Uow
 
         private readonly Dictionary<string, IDatabaseApi> _databaseApis;
         private readonly Dictionary<string, ITransactionApi> _transactionApis;
-        private readonly UnitOfWorkDefaultOptions _defaultOptions;
+        //private readonly UnitOfWorkDefaultOptions _defaultOptions;
         private TransactionScope _contextTransactionScope;
 
         private Exception _exception;
         private bool _isCompleting;
         private bool _isRolledback;
 
-        public UnitOfWork(IServiceProvider serviceProvider, IOptions<UnitOfWorkDefaultOptions> options)
+        public UnitOfWork(IServiceProvider serviceProvider)//, IOptions<UnitOfWorkDefaultOptions> options)
         {
             ServiceProvider = serviceProvider;
-            _defaultOptions = options.Value;
+            //_defaultOptions = options.Value;
 
             _databaseApis = new Dictionary<string, IDatabaseApi>();
             _transactionApis = new Dictionary<string, ITransactionApi>();
@@ -59,24 +59,24 @@ namespace Volo.Abp.Uow
                 throw new AbpException("This unit of work is already initialized before!");
             }
 
-            if (options.UseTransactionScope) BeginTransactionScope(options);
-
-            Options = _defaultOptions.Normalize(options.Clone());
+            Options = options;// _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
+
+            if (this.Options.UseTransactionScope) BeginTransactionScope(this.Options);
         }
 
-        public virtual void Reserve(string reservationName)
+        public virtual void Reserve(string reservationName, UnitOfWorkOptions options)
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
-            Options = _defaultOptions.Normalize(new UnitOfWorkOptions());
+            Options = options;
             ReservationName = reservationName;
             IsReserved = true;
         }
 
-        protected virtual void BeginTransactionScope(IUnitOfWorkOptions options = null)
+        protected virtual void BeginTransactionScope(IUnitOfWorkOptions options)
         {
-            _contextTransactionScope = this.BeginUowTransactionScope(options ?? this.Options);
+            _contextTransactionScope = this.BeginUowTransactionScope(options);
         }
 
         public virtual void SetOuter(IUnitOfWork outer)
