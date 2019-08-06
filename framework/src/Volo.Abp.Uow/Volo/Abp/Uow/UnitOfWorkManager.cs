@@ -131,5 +131,19 @@ namespace Volo.Abp.Uow
                 throw;
             }
         }
+
+        private IUnitOfWork CreateNewChildUnitOfWork(IUnitOfWork parent, IUnitOfWorkOptions options)
+        {
+            var unitOfWork = new ChildUnitOfWork(parent, options);
+
+            _ambientUnitOfWork.SetUnitOfWork(unitOfWork);
+
+            unitOfWork.Disposed += (sender, args) =>
+            {
+                _ambientUnitOfWork.SetUnitOfWork(parent);
+            };
+
+            return unitOfWork;
+        }
     }
 }
