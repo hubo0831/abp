@@ -9,7 +9,7 @@ using Volo.Abp.Threading;
 
 namespace Volo.Abp.Uow
 {
-    public class UnitOfWork : IUnitOfWork, ITransientDependency
+    public class UnitOfWork : IUnitOfWork, ITransactionUnitOfWork, ITransientDependency
     {
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -35,7 +35,6 @@ namespace Volo.Abp.Uow
         private readonly Dictionary<string, IDatabaseApi> _databaseApis;
         private readonly Dictionary<string, ITransactionApi> _transactionApis;
         //private readonly UnitOfWorkDefaultOptions _defaultOptions;
-        private TransactionScope _contextTransactionScope;
 
         private Exception _exception;
         private bool _isCompleting;
@@ -61,8 +60,6 @@ namespace Volo.Abp.Uow
 
             Options = options;// _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
-
-            if (this.Options.UseTransactionScope) BeginTransactionScope(this.Options);
         }
 
         public virtual void Reserve(string reservationName, UnitOfWorkOptions options)
@@ -74,14 +71,14 @@ namespace Volo.Abp.Uow
             IsReserved = true;
         }
 
-        protected virtual void BeginTransactionScope(IUnitOfWorkOptions options)
-        {
-            _contextTransactionScope = this.BeginUowTransactionScope(options);
-        }
-
         public virtual void SetOuter(IUnitOfWork outer)
         {
             Outer = outer;
+        }
+
+        public virtual void BeginTransaction(IUnitOfWorkOptions options)
+        {
+
         }
 
         public virtual void SaveChanges()
@@ -294,11 +291,6 @@ namespace Volo.Abp.Uow
                 }
                 catch { }
             }
-            try
-            {
-                _contextTransactionScope?.Dispose();
-            }
-            catch { }
         }
 
         private void PreventMultipleComplete()
@@ -328,11 +320,6 @@ namespace Volo.Abp.Uow
                 }
                 catch { }
             }
-            try
-            {
-                _contextTransactionScope?.Dispose();
-            }
-            catch { }
         }
 
         protected virtual async Task RollbackAllAsync(CancellationToken cancellationToken)
@@ -360,34 +347,22 @@ namespace Volo.Abp.Uow
                     catch { }
                 }
             }
-            try
-            {
-                _contextTransactionScope?.Dispose();
-            }
-            catch { }
         }
 
-        protected virtual void CommitTransactionScope()
-        {
-            _contextTransactionScope?.Complete();
-        }
-
-        protected virtual void CommitTransactions()
+        public virtual void CommitTransactions()
         {
             foreach (var transaction in _transactionApis.Values)
             {
                 transaction.Commit();
             }
-            CommitTransactionScope();
         }
 
-        protected virtual async Task CommitTransactionsAsync(CancellationToken cancellationToken = default)
+        public virtual async Task CommitTransactionsAsync(CancellationToken cancellationToken = default)
         {
             foreach (var transaction in _transactionApis.Values)
             {
                 await transaction.CommitAsync();
             }
-            CommitTransactionScope();
         }
 
         public override string ToString()

@@ -19,11 +19,6 @@ namespace Volo.Abp.Uow
         public bool? IsTransactional { get; set; }
 
         /// <summary>
-        /// Is this UOW use TransactionScope?
-        /// </summary>
-        public bool UseTransactionScope { get; set; }
-
-        /// <summary>
         /// Timeout of UOW As milliseconds.
         /// Uses default value if not supplied.
         /// </summary>
@@ -78,8 +73,6 @@ namespace Volo.Abp.Uow
             {
                 options.IsTransactional = IsTransactional.Value;
             }
-
-            options.UseTransactionScope = UseTransactionScope;
 
             if (Timeout.HasValue)
             {

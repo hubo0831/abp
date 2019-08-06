@@ -43,7 +43,14 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
                     CreateDbContext(unitOfWork, connectionStringName, connectionString)
                 ));
 
-            return ((EfCoreDatabaseApi<TDbContext>)databaseApi).DbContext;
+            var dbContext = ((EfCoreDatabaseApi<TDbContext>)databaseApi).DbContext;
+
+            if (unitOfWork.Options.IsTransactional && dbContext.Database.CurrentTransaction == null)
+            {
+                CheckDbContextTransaction(unitOfWork, dbContext, connectionString);
+            }
+
+            return dbContext;
         }
 
         private TDbContext CreateDbContext(IUnitOfWork unitOfWork, string connectionStringName, string connectionString)
@@ -71,7 +78,7 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
                 : unitOfWork.ServiceProvider.GetRequiredService<TDbContext>();
         }
 
-        public TDbContext CreateDbContextWithTransaction(IUnitOfWork unitOfWork) 
+        public TDbContext CreateDbContextWithTransaction(IUnitOfWork unitOfWork)
         {
             var transactionApiKey = $"EntityFrameworkCore_{DbContextCreationContext.Current.ConnectionString}";
             var activeTransaction = unitOfWork.FindTransactionApi(transactionApiKey) as EfCoreTransactionApi;
@@ -112,6 +119,39 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
                 activeTransaction.AttendedDbContexts.Add(dbContext);
 
                 return dbContext;
+            }
+        }
+        private void CheckDbContextTransaction(IUnitOfWork unitOfWork, TDbContext dbContext, string connectionString)
+        {
+            var transactionApiKey = $"EntityFrameworkCore_{connectionString}";
+            var activeTransaction = unitOfWork.FindTransactionApi(transactionApiKey) as EfCoreTransactionApi;
+
+            if (activeTransaction == null)
+            {
+                var dbtransaction = unitOfWork.Options.IsolationLevel.HasValue
+                    ? dbContext.Database.BeginTransaction(unitOfWork.Options.IsolationLevel.Value)
+                    : dbContext.Database.BeginTransaction();
+
+                unitOfWork.AddTransactionApi(
+                    transactionApiKey,
+                    new EfCoreTransactionApi(
+                        dbtransaction,
+                        dbContext
+                    )
+                );
+            }
+            else
+            {
+                if (dbContext.As<DbContext>().HasRelationalTransactionManager())
+                {
+                    dbContext.Database.UseTransaction(activeTransaction.DbContextTransaction.GetDbTransaction());
+                }
+                else
+                {
+                    dbContext.Database.BeginTransaction(); //TODO: Why not using the new created transaction?
+                }
+
+                activeTransaction.AttendedDbContexts.Add(dbContext);
             }
         }
     }

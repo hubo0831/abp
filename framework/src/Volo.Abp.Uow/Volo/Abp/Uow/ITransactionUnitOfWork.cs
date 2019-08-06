@@ -1,9 +1,14 @@
-﻿namespace Volo.Abp.Uow
+﻿using System.Threading;
+using System.Threading.Tasks;
+
+namespace Volo.Abp.Uow
 {
     public interface ITransactionUnitOfWork
     {
-        void Begin(IUnitOfWorkOptions options = null);
+        void BeginTransaction(IUnitOfWorkOptions options);
 
-        void Commit();
+        void CommitTransactions();
+
+        Task CommitTransactionsAsync(CancellationToken cancellationToken = default);
     }
 }
