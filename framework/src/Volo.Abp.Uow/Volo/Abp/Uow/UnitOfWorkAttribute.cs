@@ -42,6 +42,11 @@ namespace Volo.Abp.Uow
         /// </summary>
         public bool RequiresNew { get; set; }
 
+        /// <summary>
+        /// 是否使用父的事务环境
+        /// </summary>
+        public bool UseParentTransaction { get; set; }
+
         public UnitOfWorkAttribute()
         {
             
@@ -83,6 +88,8 @@ namespace Volo.Abp.Uow
             {
                 options.IsolationLevel = IsolationLevel;
             }
+
+            options.UseParentTransaction = UseParentTransaction;
         }
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 
 namespace Volo.Abp.Uow
@@ -11,16 +10,13 @@ namespace Volo.Abp.Uow
 
         private readonly IServiceProvider _serviceProvider;
         private readonly IAmbientUnitOfWork _ambientUnitOfWork;
-        private readonly UnitOfWorkDefaultOptions _defaultOptions;
 
         public UnitOfWorkManager(
-            IServiceProvider serviceProvider,
-            IAmbientUnitOfWork ambientUnitOfWork,
-            IOptions<UnitOfWorkDefaultOptions> options)
+            IServiceProvider serviceProvider, 
+            IAmbientUnitOfWork ambientUnitOfWork)
         {
             _serviceProvider = serviceProvider;
             _ambientUnitOfWork = ambientUnitOfWork;
-            _defaultOptions = options.Value;
         }
 
         public IUnitOfWork Begin(UnitOfWorkOptions options, bool requiresNew = false)
@@ -28,10 +24,9 @@ namespace Volo.Abp.Uow
             Check.NotNull(options, nameof(options));
 
             var currentUow = Current;
-            options = _defaultOptions.Normalize(options.Clone());
             if (currentUow != null && !requiresNew)
             {
-                return new ChildUnitOfWork(currentUow, options);
+                return new ChildUnitOfWork(currentUow);
             }
 
             var unitOfWork = CreateNewUnitOfWork();
@@ -44,16 +39,15 @@ namespace Volo.Abp.Uow
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
-            var options = _defaultOptions.Normalize(new UnitOfWorkOptions());
-            if (!requiresNew &&
+            if (!requiresNew && 
                 _ambientUnitOfWork.UnitOfWork != null &&
                 _ambientUnitOfWork.UnitOfWork.IsReservedFor(reservationName))
             {
-                return new ChildUnitOfWork(_ambientUnitOfWork.UnitOfWork, options);
+                return new ChildUnitOfWork(_ambientUnitOfWork.UnitOfWork);
             }
 
             var unitOfWork = CreateNewUnitOfWork();
-            unitOfWork.Reserve(reservationName, options);
+            unitOfWork.Reserve(reservationName);
 
             return unitOfWork;
         }
@@ -83,7 +77,6 @@ namespace Volo.Abp.Uow
                 return false;
             }
 
-            options = _defaultOptions.Normalize(options.Clone());
             uow.Initialize(options);
 
             return true;
@@ -130,20 +123,6 @@ namespace Volo.Abp.Uow
                 scope.Dispose();
                 throw;
             }
-        }
-
-        private IUnitOfWork CreateNewChildUnitOfWork(IUnitOfWork parent, IUnitOfWorkOptions options)
-        {
-            var unitOfWork = new ChildUnitOfWork(parent, options);
-
-            _ambientUnitOfWork.SetUnitOfWork(unitOfWork);
-
-            unitOfWork.Disposed += (sender, args) =>
-            {
-                _ambientUnitOfWork.SetUnitOfWork(parent);
-            };
-
-            return unitOfWork;
         }
     }
 }

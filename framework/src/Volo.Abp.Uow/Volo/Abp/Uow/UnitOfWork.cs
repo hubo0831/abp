@@ -2,14 +2,13 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 using Microsoft.Extensions.Options;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Threading;
 
 namespace Volo.Abp.Uow
 {
-    public class UnitOfWork : IUnitOfWork, ITransactionUnitOfWork, ITransientDependency
+    public class UnitOfWork : IUnitOfWork, ITransientDependency
     {
         public Guid Id { get; } = Guid.NewGuid();
 
@@ -34,16 +33,16 @@ namespace Volo.Abp.Uow
 
         private readonly Dictionary<string, IDatabaseApi> _databaseApis;
         private readonly Dictionary<string, ITransactionApi> _transactionApis;
-        //private readonly UnitOfWorkDefaultOptions _defaultOptions;
+        private readonly UnitOfWorkDefaultOptions _defaultOptions;
 
         private Exception _exception;
         private bool _isCompleting;
         private bool _isRolledback;
 
-        public UnitOfWork(IServiceProvider serviceProvider)//, IOptions<UnitOfWorkDefaultOptions> options)
+        public UnitOfWork(IServiceProvider serviceProvider, IOptions<UnitOfWorkDefaultOptions> options)
         {
             ServiceProvider = serviceProvider;
-            //_defaultOptions = options.Value;
+            _defaultOptions = options.Value;
 
             _databaseApis = new Dictionary<string, IDatabaseApi>();
             _transactionApis = new Dictionary<string, ITransactionApi>();
@@ -58,15 +57,26 @@ namespace Volo.Abp.Uow
                 throw new AbpException("This unit of work is already initialized before!");
             }
 
-            Options = options;// _defaultOptions.Normalize(options.Clone());
+            Options = _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
+
+            if (!this.Options.UseParentTransaction) return;
+            var parent = this.Outer.As<UnitOfWork>();
+            foreach (var pair in parent._databaseApis)
+            {
+                _databaseApis.Add(pair.Key, pair.Value);
+            }
+            foreach (var pair in parent._transactionApis)
+            {
+                _transactionApis.Add(pair.Key, pair.Value);
+            }
         }
 
-        public virtual void Reserve(string reservationName, UnitOfWorkOptions options)
+        public virtual void Reserve(string reservationName)
         {
             Check.NotNull(reservationName, nameof(reservationName));
 
-            Options = options;
+            Options = _defaultOptions.Normalize(UnitOfWorkOptions.Default);
             ReservationName = reservationName;
             IsReserved = true;
         }
@@ -74,11 +84,6 @@ namespace Volo.Abp.Uow
         public virtual void SetOuter(IUnitOfWork outer)
         {
             Outer = outer;
-        }
-
-        public virtual void BeginTransaction(IUnitOfWorkOptions options)
-        {
-
         }
 
         public virtual void SaveChanges()
@@ -289,7 +294,9 @@ namespace Volo.Abp.Uow
                 {
                     transactionApi.Dispose();
                 }
-                catch { }
+                catch
+                {
+                }
             }
         }
 
@@ -349,7 +356,7 @@ namespace Volo.Abp.Uow
             }
         }
 
-        public virtual void CommitTransactions()
+        protected virtual void CommitTransactions()
         {
             foreach (var transaction in _transactionApis.Values)
             {
@@ -357,7 +364,7 @@ namespace Volo.Abp.Uow
             }
         }
 
-        public virtual async Task CommitTransactionsAsync(CancellationToken cancellationToken = default)
+        protected virtual async Task CommitTransactionsAsync()
         {
             foreach (var transaction in _transactionApis.Values)
             {

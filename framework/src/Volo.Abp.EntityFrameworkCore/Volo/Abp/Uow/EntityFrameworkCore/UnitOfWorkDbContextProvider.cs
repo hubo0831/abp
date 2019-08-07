@@ -37,16 +37,17 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
 
             var dbContextKey = $"{typeof(TDbContext).FullName}_{connectionString}";
 
-            var databaseApi = unitOfWork.GetOrAddDatabaseApi(
-                dbContextKey,
-                () => new EfCoreDatabaseApi<TDbContext>(
-                    CreateDbContext(unitOfWork, connectionStringName, connectionString)
-                ));
-
-            var dbContext = ((EfCoreDatabaseApi<TDbContext>)databaseApi).DbContext;
-
-            if (unitOfWork.Options.IsTransactional && dbContext.Database.CurrentTransaction == null)
+            var databaseApi = unitOfWork.FindDatabaseApi(dbContextKey);
+            TDbContext dbContext;
+            if (databaseApi == null)
             {
+                dbContext = CreateDbContext(unitOfWork, connectionStringName, connectionString);
+                databaseApi = new EfCoreDatabaseApi<TDbContext>(dbContext);
+                unitOfWork.AddDatabaseApi(dbContextKey, databaseApi);
+            }
+            else
+            {
+                dbContext = ((EfCoreDatabaseApi<TDbContext>)databaseApi).DbContext;
                 CheckDbContextTransaction(unitOfWork, dbContext, connectionString);
             }
 
@@ -123,6 +124,9 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
         }
         private void CheckDbContextTransaction(IUnitOfWork unitOfWork, TDbContext dbContext, string connectionString)
         {
+            if (!unitOfWork.Options.IsTransactional) return;
+            if (dbContext.Database.CurrentTransaction != null) return;
+
             var transactionApiKey = $"EntityFrameworkCore_{connectionString}";
             var activeTransaction = unitOfWork.FindTransactionApi(transactionApiKey) as EfCoreTransactionApi;
 
@@ -132,12 +136,8 @@ namespace Volo.Abp.Uow.EntityFrameworkCore
                     ? dbContext.Database.BeginTransaction(unitOfWork.Options.IsolationLevel.Value)
                     : dbContext.Database.BeginTransaction();
 
-                unitOfWork.AddTransactionApi(
-                    transactionApiKey,
-                    new EfCoreTransactionApi(
-                        dbtransaction,
-                        dbContext
-                    )
+                unitOfWork.AddTransactionApi(transactionApiKey,
+                    new EfCoreTransactionApi(dbtransaction, dbContext)
                 );
             }
             else

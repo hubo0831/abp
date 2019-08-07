@@ -1,7 +1,6 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Transactions;
 using JetBrains.Annotations;
 
 namespace Volo.Abp.Uow
@@ -29,9 +28,7 @@ namespace Volo.Abp.Uow
 
         private readonly IUnitOfWork _parent;
 
-        private readonly ITransactionUnitOfWork _parentTransaction;
-
-        public ChildUnitOfWork([NotNull] IUnitOfWork parent, IUnitOfWorkOptions options = null)
+        public ChildUnitOfWork([NotNull] IUnitOfWork parent)
         {
             Check.NotNull(parent, nameof(parent));
 
@@ -39,17 +36,6 @@ namespace Volo.Abp.Uow
 
             _parent.Failed += (sender, args) => { Failed.InvokeSafely(sender, args); };
             _parent.Disposed += (sender, args) => { Disposed.InvokeSafely(sender, args); };
-
-            if (options != null && options.IsTransactional)
-            {
-                while (parent != null)
-                {
-                    _parentTransaction = parent as ITransactionUnitOfWork;
-                    if (_parentTransaction != null) break;
-                    parent = parent.Outer;
-                }
-                _parentTransaction.BeginTransaction(options);
-            }
         }
 
         public void SetOuter(IUnitOfWork outer)
@@ -62,9 +48,9 @@ namespace Volo.Abp.Uow
             _parent.Initialize(options);
         }
 
-        public void Reserve(string reservationName, UnitOfWorkOptions options)
+        public void Reserve(string reservationName)
         {
-            _parent.Reserve(reservationName, options);
+            _parent.Reserve(reservationName);
         }
 
         public void SaveChanges()
@@ -79,14 +65,12 @@ namespace Volo.Abp.Uow
 
         public void Complete()
         {
-            SaveChanges();
-            if (_parentTransaction != null) _parentTransaction.CommitTransactions();
+
         }
 
-        public async Task CompleteAsync(CancellationToken cancellationToken = default)
+        public Task CompleteAsync(CancellationToken cancellationToken = default)
         {
-            await SaveChangesAsync(cancellationToken);
-            if (_parentTransaction != null) await _parentTransaction.CommitTransactionsAsync(cancellationToken);
+            return Task.CompletedTask;
         }
 
         public void Rollback()
@@ -94,9 +78,9 @@ namespace Volo.Abp.Uow
             _parent.Rollback();
         }
 
-        public async Task RollbackAsync(CancellationToken cancellationToken = default)
+        public Task RollbackAsync(CancellationToken cancellationToken = default)
         {
-            await _parent.RollbackAsync(cancellationToken);
+            return _parent.RollbackAsync(cancellationToken);
         }
 
         public void OnCompleted(Func<Task> handler)
@@ -136,6 +120,7 @@ namespace Volo.Abp.Uow
 
         public void Dispose()
         {
+
         }
 
         public override string ToString()

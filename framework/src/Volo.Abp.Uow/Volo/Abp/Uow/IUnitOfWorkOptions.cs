@@ -10,5 +10,7 @@ namespace Volo.Abp.Uow
         IsolationLevel? IsolationLevel { get; }
 
         TimeSpan? Timeout { get; }
+
+        bool UseParentTransaction { get; }
     }
 }
