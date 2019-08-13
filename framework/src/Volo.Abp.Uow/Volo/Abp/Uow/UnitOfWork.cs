@@ -60,7 +60,7 @@ namespace Volo.Abp.Uow
             Options = _defaultOptions.Normalize(options.Clone());
             IsReserved = false;
 
-            if (!this.Options.UseParentTransaction) return;
+            if (this.Outer == null || !this.Options.UseParentTransaction) return;
             var parent = this.Outer.As<UnitOfWork>();
             foreach (var pair in parent._databaseApis)
             {
