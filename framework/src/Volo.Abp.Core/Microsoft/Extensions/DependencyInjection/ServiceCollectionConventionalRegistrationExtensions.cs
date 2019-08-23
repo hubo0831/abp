@@ -13,6 +13,13 @@ namespace Microsoft.Extensions.DependencyInjection
             return services;
         }
 
+        public static IServiceCollection RemoveConventionalRegistrar(this IServiceCollection services, Type conventionalRegistrarType)
+        {
+            var conventionalRegistrars = GetOrCreateRegistrarList(services);
+            conventionalRegistrars.RemoveAll(e => e.GetType() == conventionalRegistrarType);
+            return services;
+        }
+
         internal static List<IConventionalRegistrar> GetConventionalRegistrars(this IServiceCollection services)
         {
             return GetOrCreateRegistrarList(services);
