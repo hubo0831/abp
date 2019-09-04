@@ -1,4 +1,4 @@
-﻿using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using System;
@@ -7,7 +7,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using Volo.Abp.Cli.Http;
-using Volo.Abp.Cli.ProjectBuilding.Building;
 using Volo.Abp.DependencyInjection;
 using Volo.Abp.Http;
 using Volo.Abp.IO;
@@ -40,13 +39,12 @@ namespace Volo.Abp.Cli.ProjectBuilding
 
         public async Task<TemplateFile> GetAsync(
             string name,
-            DatabaseProvider databaseProvider,
-            string projectName,
             string version = null)
         {
+            var latestVersion = await GetLatestTemplateVersionAsync(name);
             if (version == null)
             {
-                version = await GetLatestTemplateVersionAsync(name);
+                version = latestVersion;
             }
 
             DirectoryHelper.CreateIfNotExists(CliPaths.TemplateCache);
@@ -55,7 +53,7 @@ namespace Volo.Abp.Cli.ProjectBuilding
             if (Options.CacheTemplates && File.Exists(localCacheFile))
             {
                 Logger.LogInformation("Using cached template: " + name + ", version: " + version);
-                return new TemplateFile(File.ReadAllBytes(localCacheFile), version);
+                return new TemplateFile(File.ReadAllBytes(localCacheFile), version, latestVersion);
             }
 
             Logger.LogInformation("Downloading template: " + name + ", version: " + version);
@@ -64,10 +62,7 @@ namespace Volo.Abp.Cli.ProjectBuilding
                 new TemplateDownloadInputDto
                 {
                     Name = name,
-                    Version = version,
-                    DatabaseProvider = databaseProvider.ToString(),
-                    ProjectName = projectName,
-                    Tool = Options.ToolName
+                    Version = version
                 }
             );
 
@@ -76,7 +71,7 @@ namespace Volo.Abp.Cli.ProjectBuilding
                 File.WriteAllBytes(localCacheFile, fileContent);
             }
 
-            return new TemplateFile(fileContent, version);
+            return new TemplateFile(fileContent, version, latestVersion);
         }
 
         private async Task<string> GetLatestTemplateVersionAsync(string name)
@@ -105,7 +100,7 @@ namespace Volo.Abp.Cli.ProjectBuilding
         {
             var postData = JsonSerializer.Serialize(input);
 
-            using (var client = new CliHttpClient())
+            using (var client = new CliHttpClient(TimeSpan.FromMinutes(10)))
             {
                 var responseMessage = await client.PostAsync(
                     $"{CliUrls.WwwAbpIo}api/download/template/",
@@ -127,12 +122,6 @@ namespace Volo.Abp.Cli.ProjectBuilding
             public string Name { get; set; }
 
             public string Version { get; set; }
-
-            public string DatabaseProvider { get; set; }
-
-            public string ProjectName { get; set; }
-
-            public string Tool { get; set; }
         }
 
         public class GetLatestTemplateVersionDto

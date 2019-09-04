@@ -21,8 +21,9 @@ namespace Volo.Abp.Cli.ProjectModification
         protected ProjectNugetPackageAdder ProjectNugetPackageAdder { get; }
         protected DbContextFileBuilderConfigureAdder DbContextFileBuilderConfigureAdder { get; }
         protected EfCoreMigrationAdder EfCoreMigrationAdder { get; }
-        protected ProjectNpmPackageAdder ProjectNpmPackageAdder { get; }
         protected DerivedClassFinder DerivedClassFinder { get; }
+        protected ProjectNpmPackageAdder ProjectNpmPackageAdder { get; }
+        protected NpmGlobalPackagesChecker NpmGlobalPackagesChecker { get; }
 
         public SolutionModuleAdder(
             IJsonSerializer jsonSerializer,
@@ -30,20 +31,23 @@ namespace Volo.Abp.Cli.ProjectModification
             DbContextFileBuilderConfigureAdder dbContextFileBuilderConfigureAdder,
             EfCoreMigrationAdder efCoreMigrationAdder,
             DerivedClassFinder derivedClassFinder,
-            ProjectNpmPackageAdder projectNpmPackageAdder)
+            ProjectNpmPackageAdder projectNpmPackageAdder,
+            NpmGlobalPackagesChecker npmGlobalPackagesChecker)
         {
-            EfCoreMigrationAdder = efCoreMigrationAdder;
-            DerivedClassFinder = derivedClassFinder;
             JsonSerializer = jsonSerializer;
             ProjectNugetPackageAdder = projectNugetPackageAdder;
             DbContextFileBuilderConfigureAdder = dbContextFileBuilderConfigureAdder;
+            EfCoreMigrationAdder = efCoreMigrationAdder;
+            DerivedClassFinder = derivedClassFinder;
             ProjectNpmPackageAdder = projectNpmPackageAdder;
+            NpmGlobalPackagesChecker = npmGlobalPackagesChecker;
             Logger = NullLogger<SolutionModuleAdder>.Instance;
         }
 
         public virtual async Task AddAsync(
             [NotNull] string solutionFile,
             [NotNull] string moduleName,
+            string startupProject,
             bool skipDbMigrations = false)
         {
             Check.NotNull(solutionFile, nameof(solutionFile));
@@ -72,6 +76,8 @@ namespace Volo.Abp.Cli.ProjectModification
                 var targetProjects = ProjectFinder.FindNpmTargetProjectFile(projectFiles);
                 if (targetProjects.Any())
                 {
+                    NpmGlobalPackagesChecker.Check();
+
                     foreach (var targetProject in targetProjects)
                     {
                         foreach (var npmPackage in module.NpmPackages.Where(p => p.ApplicationType.HasFlag(NpmApplicationType.Mvc)))
@@ -86,10 +92,10 @@ namespace Volo.Abp.Cli.ProjectModification
                 }
             }
 
-            ModifyDbContext(projectFiles, module, skipDbMigrations);
+            ModifyDbContext(projectFiles, module, startupProject, skipDbMigrations);
         }
 
-        protected void ModifyDbContext(string[] projectFiles, ModuleInfo module, bool skipDbMigrations = false)
+        protected void ModifyDbContext(string[] projectFiles, ModuleInfo module, string startupProject, bool skipDbMigrations = false)
         {
             if (string.IsNullOrWhiteSpace(module.EfCoreConfigureMethodName))
             {
@@ -117,7 +123,7 @@ namespace Volo.Abp.Cli.ProjectModification
 
             if (!skipDbMigrations)
             {
-                EfCoreMigrationAdder.AddMigration(dbMigrationsProject, module.Name); 
+                EfCoreMigrationAdder.AddMigration(dbMigrationsProject, module.Name, startupProject); 
             }
         }
 

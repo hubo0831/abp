@@ -10,11 +10,13 @@
 
 你可以从[GitHub存储库](https://github.com/volosoft/abp/tree/master/samples/BookStore)访问应用程序的**源代码**.
 
+> 你也可以观看由ABP社区成员为本教程录制的[视频课程](https://amazingsolutions.teachable.com/p/lets-build-the-bookstore-application).
+
 ### 新增 Book 实体
 
 通过本节, 你将会了解如何创建一个 modal form 来实现新增书籍的功能. 最终成果如下图所示:
 
-![bookstore-create-dialog](images/bookstore-create-dialog.png)
+![bookstore-create-dialog](images/bookstore-create-dialog-2.png)
 
 #### 新建 modal form
 
@@ -32,7 +34,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Acme.BookStore.Web.Pages.Books
 {
-    public class CreateModalModel : BookStorePageModelBase
+    public class CreateModalModel : BookStorePageModel
     {
         [BindProperty]
         public CreateUpdateBookDto Book { get; set; }
@@ -53,7 +55,7 @@ namespace Acme.BookStore.Web.Pages.Books
 }
 ````
 
-* 该类派生于 `BookStorePageModelBase` 而非默认的 `PageModel`. `BookStorePageModelBase` 继承了 `PageModel` 并且添加了一些可以被你的page model类使用的通用属性和方法.
+* 该类派生于 `BookStorePageModel` 而非默认的 `PageModel`. `BookStorePageModel` 继承了 `PageModel` 并且添加了一些可以被你的page model类使用的通用属性和方法.
 *  `Book` 属性上的 `[BindProperty]` 特性将post请求提交上来的数据绑定到该属性上.
 * 该类通过构造函数注入了 `IBookAppService` 应用服务,并且在 `OnPostAsync` 处理程序中调用了服务的 `CreateAsync` 方法.
 
@@ -63,7 +65,7 @@ namespace Acme.BookStore.Web.Pages.Books
 
 ````html
 @page
-@inherits Acme.BookStore.Web.Pages.BookStorePageBase
+@inherits Acme.BookStore.Web.Pages.BookStorePage
 @using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
 @model Acme.BookStore.Web.Pages.Books.CreateModalModel
 @{
@@ -145,7 +147,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Acme.BookStore.Web.Pages.Books
 {
-    public class EditModalModel : BookStorePageModelBase
+    public class EditModalModel : BookStorePageModel
     {
         [HiddenInput]
         [BindProperty(SupportsGet = true)]
@@ -207,7 +209,7 @@ namespace Acme.BookStore.Web
 
 ````html
 @page
-@inherits Acme.BookStore.Web.Pages.BookStorePageBase
+@inherits Acme.BookStore.Web.Pages.BookStorePage
 @using Acme.BookStore.Web.Pages.Books
 @using Volo.Abp.AspNetCore.Mvc.UI.Bootstrap.TagHelpers.Modal
 @model EditModalModel
@@ -313,8 +315,10 @@ $(function () {
 ````
 
 * 通过 `abp.localization.getResource('BookStore')` 可以在客户端使用服务器端定义的相同的本地化语言文本.
+* 添加了一个名为 `createModal` 的新的 `ModalManager` 来打开创建用的 modal 对话框.
 * 添加了一个名为 `editModal` 的新的 `ModalManager` 来打开编辑用的 modal 对话框.
 * 在 `columnDefs` 起始处新增一列用于显示 "Actions" 下拉按钮.
+* "New Book"动作只需调用`createModal.open`来打开创建对话框.
 * "Edit" 操作只是简单调用 `editModal.open` 来打开编辑对话框.
 
 现在,你可以运行程序,通过编辑操作来更新任一个book实体.
@@ -355,6 +359,12 @@ $(function () {
     var editModal = new abp.ModalManager(abp.appPath + 'Books/EditModal');
 
     var dataTable = $('#BooksTable').DataTable(abp.libs.datatables.normalizeConfiguration({
+        processing: true,
+        serverSide: true,
+        paging: true,
+        searching: false,
+        autoWidth: false,
+        scrollCollapse: true,
         order: [[1, "asc"]],
         ajax: abp.libs.datatables.createAjax(acme.bookStore.book.getList),
         columnDefs: [

@@ -15,7 +15,7 @@ namespace Volo.Abp.TenantManagement
         private readonly ICurrentTenant _currentTenant;
 
         public TenantStore(
-            ITenantRepository tenantRepository,
+            ITenantRepository tenantRepository, 
             IObjectMapper objectMapper,
             ICurrentTenant currentTenant)
         {
@@ -55,9 +55,37 @@ namespace Volo.Abp.TenantManagement
                 return _objectMapper.Map<Tenant, TenantConfiguration>(tenant);
             }
         }
+
         protected virtual async Task<Tenant> FindByIdAsync(Guid id)
         {
             return await _tenantRepository.FindAsync(id);
+
+        public TenantConfiguration Find(string name)
+        {
+            using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
+            {
+                var tenant = _tenantRepository.FindByName(name);
+                if (tenant == null)
+                {
+                    return null;
+                }
+
+                return _objectMapper.Map<Tenant, TenantConfiguration>(tenant);
+            }
+        }
+
+        public TenantConfiguration Find(Guid id)
+        {
+            using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
+            {
+                var tenant = _tenantRepository.Find(id);
+                if (tenant == null)
+                {
+                    return null;
+                }
+
+                return _objectMapper.Map<Tenant, TenantConfiguration>(tenant);
+            }
         }
     }
 }
