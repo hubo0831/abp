@@ -52,7 +52,7 @@ namespace Volo.Abp.AspNetCore.Mvc.ExceptionHandling
             }
         }
 
-        private async Task HandleAndWrapException(HttpContext httpContext, Exception exception)
+        protected virtual async Task HandleAndWrapException(HttpContext httpContext, Exception exception)
         {
             _logger.LogException(exception);
 
@@ -65,16 +65,15 @@ namespace Volo.Abp.AspNetCore.Mvc.ExceptionHandling
             httpContext.Response.OnStarting(_clearCacheHeadersDelegate, httpContext.Response);
             httpContext.Response.Headers.Add(AbpHttpConsts.AbpErrorFormat, "true");
 
-            await httpContext.Response.WriteAsync(
-                jsonSerializer.Serialize(
-                    new RemoteServiceErrorResponse(
-                        errorInfoConverter.Convert(exception)
-                    )
-                )
-            );
+            var errorResponse = BuildErrorResponse(errorInfoConverter, exception);
+            await httpContext.Response.WriteAsync(jsonSerializer.Serialize(errorResponse));
+        }
+        protected virtual object BuildErrorResponse(IExceptionToErrorInfoConverter errorInfoConverter, Exception exception)
+        {
+            return new RemoteServiceErrorResponse(errorInfoConverter.Convert(exception));
         }
 
-        private Task ClearCacheHeaders(object state)
+        protected virtual Task ClearCacheHeaders(object state)
         {
             var response = (HttpResponse)state;
 
