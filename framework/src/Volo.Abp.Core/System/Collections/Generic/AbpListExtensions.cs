@@ -235,5 +235,18 @@ namespace System.Collections.Generic
                 sorted.Add(item);
             }
         }
+        /// <summary>删除一个符合条件的项</summary>
+        public static void RemoveOne<T>([NotNull] this IList<T> values, Predicate<T> predicate)
+        {
+            for (int i = values.Count - 1; i >= 0; i--)
+            {
+                var item = values[i];
+                if (predicate(item))
+                {
+                    values.RemoveAt(i);
+                    break;
+                }
+            }
+        }
     }
 }

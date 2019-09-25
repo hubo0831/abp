@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
+using Volo.Abp.ExceptionHandling;
 using Volo.Abp.Modularity;
 
 namespace Volo.Abp.Validation
@@ -28,6 +29,11 @@ namespace Volo.Abp.Validation
             services.Configure<AbpValidationOptions>(options =>
             {
                 options.ObjectValidationContributors.AddIfNotContains(contributorTypes);
+            });
+
+            services.Configure<ExceptionDetailsOptions>(options =>
+            {
+                options.Add(new AbpValidationExceptionDetailsConvertContributor());
             });
         }
     }

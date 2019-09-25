@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Volo.Abp.Domain.Entities;
 using Volo.Abp.Domain.Repositories;
@@ -68,7 +69,28 @@ namespace Microsoft.Extensions.DependencyInjection
                     }
                 }
             }
-
+            return services;
+        }
+        public static IServiceCollection AddRepository(this IServiceCollection services, Type entityType, Type repositoryInterfaceType, Type repositoryImplementationType)
+        {
+            var repositoryInterface = repositoryInterfaceType.MakeGenericType(entityType);
+            if (repositoryInterface.IsAssignableFrom(repositoryImplementationType))
+            {
+                services.TryAddTransient(repositoryInterface, repositoryImplementationType);
+            }
+            return services;
+        }
+        public static IServiceCollection AddRepositoryWithPk(this IServiceCollection services, Type entityType, Type repositoryInterfaceWithPkType, Type repositoryImplementationType)
+        {
+            var primaryKeyType = EntityHelper.FindPrimaryKeyType(entityType);
+            if (primaryKeyType != null)
+            {
+                var repositoryInterfaceWithPk = repositoryInterfaceWithPkType.MakeGenericType(entityType, primaryKeyType);
+                if (repositoryInterfaceWithPk.IsAssignableFrom(repositoryImplementationType))
+                {
+                    services.TryAddTransient(repositoryInterfaceWithPk, repositoryImplementationType);
+                }
+            }
             return services;
         }
     }

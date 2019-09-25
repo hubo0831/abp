@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -294,6 +295,17 @@ namespace System
         }
 
         /// <summary>
+        /// Converts string to integer value.
+        /// </summary>
+        /// <param name="value">String value to convert</param>
+        /// <returns>Returns integer value</returns>
+        public static int ToInt32(this string value)
+        {
+            Check.NotNull(value, nameof(value));
+            return int.Parse(value);
+        }
+
+        /// <summary>
         /// Converts string to enum value.
         /// </summary>
         /// <typeparam name="T">Type of enum</typeparam>
@@ -322,19 +334,7 @@ namespace System
 
         public static string ToMd5(this string str)
         {
-            using (var md5 = MD5.Create())
-            {
-                var inputBytes = Encoding.UTF8.GetBytes(str);
-                var hashBytes = md5.ComputeHash(inputBytes);
-
-                var sb = new StringBuilder();
-                foreach (var hashByte in hashBytes)
-                {
-                    sb.Append(hashByte.ToString("X2"));
-                }
-
-                return sb.ToString();
-            }
+            return Encoding.UTF8.GetBytes(str).ToMd5(false);
         }
 
         /// <summary>

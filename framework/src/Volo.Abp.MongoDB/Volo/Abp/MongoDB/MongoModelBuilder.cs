@@ -56,28 +56,45 @@ namespace Volo.Abp.MongoDB
             }
         }
 
-        public virtual void Entity<TEntity>(Action<IMongoEntityModelBuilder<TEntity>> buildAction = null)
+        public virtual void Entity<TEntity>(Action<IMongoEntityModelBuilder<TEntity>> buildAction = null, Type baseEntityType = null)
         {
+            var baseClassMap = GetBsonClassMap(typeof(TEntity), baseEntityType);
+
             var model = (IMongoEntityModelBuilder<TEntity>)_entityModelBuilders.GetOrAdd(
                 typeof(TEntity),
-                () => new MongoEntityModelBuilder<TEntity>()
+                () => new MongoEntityModelBuilder<TEntity>(baseClassMap)
             );
 
             buildAction?.Invoke(model);
         }
 
-        public virtual void Entity(Type entityType, Action<IMongoEntityModelBuilder> buildAction = null)
+        public virtual void Entity(Type entityType, Action<IMongoEntityModelBuilder> buildAction = null, Type baseEntityType = null)
         {
             Check.NotNull(entityType, nameof(entityType));
+
+            var baseClassMap = GetBsonClassMap(entityType, baseEntityType);
 
             var model = (IMongoEntityModelBuilder)_entityModelBuilders.GetOrAdd(
                 entityType,
                 () => (IMongoEntityModelBuilder)Activator.CreateInstance(
-                    typeof(MongoEntityModelBuilder<>).MakeGenericType(entityType)
+                    typeof(MongoEntityModelBuilder<>).MakeGenericType(entityType), baseClassMap
                 )
             );
 
             buildAction?.Invoke(model);
+        }
+        public virtual BsonClassMap GetBsonClassMap(Type entityType, Type baseEntityType = null)
+        {
+            if (baseEntityType == null) return null;
+            if (!baseEntityType.IsAssignableFrom(entityType))
+            {
+                throw new AbpException($"{baseEntityType.FullName}必须是{entityType.FullName}的基类！");
+            }
+            if (_entityModelBuilders.TryGetValue(baseEntityType, out var entityModelBuilder))
+            {
+                return entityModelBuilder.As<IMongoEntityModelBuilder>().BsonMap;
+            }
+            return null;
         }
 
         public virtual IReadOnlyList<IMongoEntityModel> GetEntities()

@@ -405,14 +405,12 @@ namespace Volo.Abp.Caching
 
         protected virtual string NormalizeKey(string key)
         {
-            var normalizedKey = "c:" + CacheName + ",k:" + key;
-
+            Guid? tenantId = null;
             if (!IgnoreMultiTenancy && CurrentTenant.Id.HasValue)
             {
-                normalizedKey = "t:" + CurrentTenant.Id.Value + "," + normalizedKey;
+                tenantId = CurrentTenant.Id.Value;
             }
-
-            return normalizedKey;
+            return this.Cache.GetCacheKey(CacheName, key, tenantId);
         }
 
         protected virtual DistributedCacheEntryOptions GetDefaultCacheEntryOptions()

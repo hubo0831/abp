@@ -1,3 +1,4 @@
+using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Linq;
 using System;
@@ -284,6 +285,7 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
         {
             CheckAndSetId(entity);
             SetCreationAuditProperties(entity);
+            CheckAndSetConcurrencyStamp(entity);
             await TriggerEntityCreateEvents(entity);
             await TriggerDomainEventsAsync(entity);
         }
@@ -318,6 +320,21 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             if (entity is IEntity<Guid> entityWithGuidId && entityWithGuidId.Id == default)
             {
                 entityWithGuidId.Id = GuidGenerator.Create();
+            }
+            else if (entity is IEntity<ObjectId> entityWithObjectId && entityWithObjectId.Id == default)
+            {
+                entityWithObjectId.Id = ObjectId.GenerateNewId();
+            }
+        }
+        protected virtual void CheckAndSetConcurrencyStamp(TEntity entity)
+        {
+            if (entity is IHasConcurrencyStamp concurrencyStampEntity)
+            {
+                concurrencyStampEntity.ConcurrencyStamp = Guid.NewGuid().ToString("N");
+            }
+            else if (entity is IHasConcurrencyVersion concurrencyVersionEntity)
+            {
+                concurrencyVersionEntity.IncrementVersion();
             }
         }
 
@@ -374,19 +391,105 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
         /// </summary>
         protected virtual string SetNewConcurrencyStamp(TEntity entity)
         {
-            if (!(entity is IHasConcurrencyStamp concurrencyStampEntity))
+            if (entity is IHasConcurrencyStamp concurrencyStampEntity)
             {
-                return null;
+                var oldConcurrencyStamp = concurrencyStampEntity.ConcurrencyStamp;
+                concurrencyStampEntity.ConcurrencyStamp = Guid.NewGuid().ToString("N");
+                return oldConcurrencyStamp;
             }
+            else if (entity is IHasConcurrencyVersion concurrencyVersionEntity)
+            {
+                var oldConcurrencyStamp = concurrencyVersionEntity.Version;
+                concurrencyVersionEntity.IncrementVersion();
+                return oldConcurrencyStamp.ToString();
+            }
+            return null;
 
-            var oldConcurrencyStamp = concurrencyStampEntity.ConcurrencyStamp;
-            concurrencyStampEntity.ConcurrencyStamp = Guid.NewGuid().ToString("N");
-            return oldConcurrencyStamp;
         }
 
         protected virtual void ThrowOptimisticConcurrencyException()
         {
             throw new AbpDbConcurrencyException("Database operation expected to affect 1 row but actually affected 0 row. Data may have been modified or deleted since entities were loaded. This exception has been thrown on optimistic concurrency check.");
+        }
+
+        protected async Task<TEntity> FindOneInternalAsync(FilterDefinition<TEntity> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
+        {
+            using (var cursor = await this.Collection.FindAsync(filter, options, cancellationToken))
+            {
+                return await cursor.FirstOrDefaultAsync();
+            }
+        }
+        protected async Task<List<TEntity>> FindInternalAsync(FilterDefinition<TEntity> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
+        {
+            using (var cursor = await this.Collection.FindAsync(filter, options, cancellationToken))
+            {
+                return await cursor.ToListAsync();
+            }
+        }
+        protected virtual void AddGlobalFilters(List<FilterDefinition<TEntity>> filters)
+        {
+            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)) && DataFilter.IsEnabled<ISoftDelete>())
+            {
+                filters.Add(Builders<TEntity>.Filter.Eq(e => ((ISoftDelete)e).IsDeleted, false));
+            }
+
+            if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)))
+            {
+                var tenantId = CurrentTenant.Id;
+                filters.Add(Builders<TEntity>.Filter.Eq(e => ((IMultiTenant)e).TenantId, tenantId));
+            }
+        }
+
+        public virtual async Task<TEntity> FindOneAsync(Expression<Func<TEntity, bool>> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
+        {
+            var filters = CreateEntityFilter(filter, true);
+            return await FindOneInternalAsync(filters, options, cancellationToken);
+        }
+
+        protected virtual FilterDefinition<TEntity> CreateEntityFilter(Expression<Func<TEntity, bool>> filter, bool applyFilters = false)
+        {
+            return CreateEntityFilter(Builders<TEntity>.Filter.Where(filter), applyFilters);
+        }
+        public virtual async Task<List<TEntity>> FindAsync(Expression<Func<TEntity, bool>> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
+        {
+            var filters = CreateEntityFilter(filter, true);
+            return await FindInternalAsync(filters, options, cancellationToken);
+        }
+        protected virtual FilterDefinition<TEntity> CreateEntityFilter(FilterDefinition<TEntity> filter, bool applyFilters = false)
+        {
+            var filters = new List<FilterDefinition<TEntity>> { filter };
+
+            if (applyFilters)
+            {
+                AddGlobalFilters(filters);
+            }
+
+            return Builders<TEntity>.Filter.And(filters);
+        }
+        public virtual async Task<List<TEntity>> FindAsync(FilterDefinition<TEntity> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
+        {
+            var filters = CreateEntityFilter(filter, true);
+            return await FindInternalAsync(filters, options, cancellationToken);
+        }
+        public virtual async Task InsertAsync(IEnumerable<TEntity> entities, InsertManyOptions options = null, CancellationToken cancellationToken = default)
+        {
+            foreach (var entity in entities)
+            {
+                await ApplyAbpConceptsForAddedEntityAsync(entity);
+            }
+            await this.Collection.InsertManyAsync(entities, options, cancellationToken);
+        }
+        public virtual async Task DeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
+        {
+            foreach (var entity in entities)
+            {
+                await DeleteAsync(entity, false, cancellationToken);
+            }
+        }
+        public virtual async Task FastDeleteAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default)
+        {
+            var filters = CreateEntityFilter(filter, true);
+            await this.Collection.DeleteManyAsync(filters, cancellationToken);
         }
     }
 
@@ -414,29 +517,20 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             return entity;
         }
 
-        public virtual async Task<TEntity> GetAsync(
-            TKey id,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity> GetAsync(TKey id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
             var entity = await FindAsync(id, includeDetails, cancellationToken);
-
             if (entity == null)
             {
                 throw new EntityNotFoundException(typeof(TEntity), id);
             }
-
             return entity;
         }
 
-        public virtual async Task<TEntity> FindAsync(
-            TKey id,
-            bool includeDetails = true,
-            CancellationToken cancellationToken = default)
+        public virtual async Task<TEntity> FindAsync(TKey id, bool includeDetails = true, CancellationToken cancellationToken = default)
         {
-            return await Collection
-                .Find(CreateEntityFilter(id, true))
-                .FirstOrDefaultAsync(GetCancellationToken(cancellationToken));
+            var filters = CreateEntityFilter(id, true);
+            return await FindOneInternalAsync(filters, null, cancellationToken);
         }
 
         public virtual TEntity Find(TKey id, bool includeDetails = true)
@@ -462,49 +556,32 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
         protected override FilterDefinition<TEntity> CreateEntityFilter(TEntity entity, bool withConcurrencyStamp = false, string concurrencyStamp = null)
         {
-            if (!withConcurrencyStamp || !(entity is IHasConcurrencyStamp entityWithConcurrencyStamp))
+            var filters = new List<FilterDefinition<TEntity>>
             {
-                return Builders<TEntity>.Filter.Eq(e => e.Id, entity.Id);
-            }
-
-            if (concurrencyStamp == null)
+                Builders<TEntity>.Filter.Eq(e => e.Id, entity.Id)
+            };
+            if (withConcurrencyStamp)
             {
-                concurrencyStamp = entityWithConcurrencyStamp.ConcurrencyStamp;
+                if (entity is IHasConcurrencyStamp entityWithConcurrencyStamp)
+                {
+                    if (concurrencyStamp == null)
+                    {
+                        concurrencyStamp = entityWithConcurrencyStamp.ConcurrencyStamp;
+                    }
+                    filters.Add(Builders<TEntity>.Filter.Eq(e => ((IHasConcurrencyStamp)e).ConcurrencyStamp, concurrencyStamp));
+                }
+                else if (entity is IHasConcurrencyVersion concurrencyVersionEntity)
+                {
+                    var concurrencyVersion = concurrencyStamp == null ? concurrencyVersionEntity.Version : concurrencyStamp.ToInt32();
+                    filters.Add(Builders<TEntity>.Filter.Eq(e => ((IHasConcurrencyVersion)e).Version, concurrencyVersion));
+                }
             }
-
-            return Builders<TEntity>.Filter.And(
-                Builders<TEntity>.Filter.Eq(e => e.Id, entity.Id),
-                Builders<TEntity>.Filter.Eq(e => ((IHasConcurrencyStamp)e).ConcurrencyStamp, concurrencyStamp)
-            );
+            return Builders<TEntity>.Filter.And(filters);
         }
 
         protected virtual FilterDefinition<TEntity> CreateEntityFilter(TKey id, bool applyFilters = false)
         {
-            var filters = new List<FilterDefinition<TEntity>>
-            {
-                Builders<TEntity>.Filter.Eq(e => e.Id, id)
-            };
-
-            if (applyFilters)
-            {
-                AddGlobalFilters(filters);
-            }
-
-            return Builders<TEntity>.Filter.And(filters);
-        }
-
-        protected virtual void AddGlobalFilters(List<FilterDefinition<TEntity>> filters)
-        {
-            if (typeof(ISoftDelete).IsAssignableFrom(typeof(TEntity)) && DataFilter.IsEnabled<ISoftDelete>())
-            {
-                filters.Add(Builders<TEntity>.Filter.Eq(e => ((ISoftDelete)e).IsDeleted, false));
-            }
-
-            if (typeof(IMultiTenant).IsAssignableFrom(typeof(TEntity)))
-            {
-                var tenantId = CurrentTenant.Id;
-                filters.Add(Builders<TEntity>.Filter.Eq(e => ((IMultiTenant)e).TenantId, tenantId));
-            }
+            return CreateEntityFilter(Builders<TEntity>.Filter.Eq(e => e.Id, id), applyFilters);
         }
     }
 }

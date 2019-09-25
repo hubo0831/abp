@@ -1,10 +1,11 @@
 using MongoDB.Bson.Serialization;
 using System;
+using System.Reflection;
 
 namespace Volo.Abp.MongoDB
 {
-    public class MongoEntityModelBuilder<TEntity> : 
-        IMongoEntityModel, 
+    public class MongoEntityModelBuilder<TEntity> :
+        IMongoEntityModel,
         IHasBsonClassMap,
         IMongoEntityModelBuilder,
         IMongoEntityModelBuilder<TEntity>
@@ -18,16 +19,23 @@ namespace Volo.Abp.MongoDB
 
         private readonly BsonClassMap<TEntity> _bsonClassMap;
 
-        public MongoEntityModelBuilder()
+        public MongoEntityModelBuilder(BsonClassMap baseClassMap = null)
         {
             EntityType = typeof(TEntity);
             _bsonClassMap = new BsonClassMap<TEntity>();
+            if (baseClassMap != null) SetBaseClassMap(baseClassMap);
             _bsonClassMap.ConfigureAbpConventions();
         }
 
         public BsonClassMap GetMap()
         {
             return _bsonClassMap;
+        }
+        private void SetBaseClassMap(BsonClassMap baseClassMap)
+        {
+            //bsonClassMap.BaseClassMap = baseClassMap;
+            var fieldInfo = typeof(BsonClassMap).GetField("_baseClassMap", BindingFlags.Instance | BindingFlags.NonPublic);
+            fieldInfo.SetValue(_bsonClassMap, baseClassMap);
         }
     }
 }

@@ -6,9 +6,12 @@ namespace Volo.Abp.MongoDB.DependencyInjection
 {
     public class MongoDbContextRegistrationOptions : CommonDbContextRegistrationOptions, IMongoDbContextRegistrationOptionsBuilder
     {
-        public MongoDbContextRegistrationOptions(Type originalDbContextType, IServiceCollection services) 
+        public MongoDbContextRegistrationOptions(Type originalDbContextType, IServiceCollection services)
             : base(originalDbContextType, services)
         {
+            this.RegisterMongoDbRepositories = true;
         }
+        public bool RegisterMongoDbRepositories { get; set; }
+
     }
 }

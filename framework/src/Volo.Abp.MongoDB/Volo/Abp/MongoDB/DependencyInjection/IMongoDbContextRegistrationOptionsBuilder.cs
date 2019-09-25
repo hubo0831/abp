@@ -4,6 +4,6 @@ namespace Volo.Abp.MongoDB.DependencyInjection
 {
     public interface IMongoDbContextRegistrationOptionsBuilder : ICommonDbContextRegistrationOptionsBuilder
     {
-
+        bool RegisterMongoDbRepositories { get; set; }
     }
 }
