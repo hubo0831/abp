@@ -36,9 +36,10 @@ namespace Volo.Abp.Cli.Commands
 
             using (var scope = ServiceScopeFactory.CreateScope())
             {
-                var command = (IConsoleCommand) scope.ServiceProvider.GetRequiredService(commandType);
+                var command = (IConsoleCommand)scope.ServiceProvider.GetRequiredService(commandType);
                 Logger.LogInformation(command.GetUsageInfo());
             }
+            await Task.CompletedTask;
         }
 
         public string GetUsageInfo()

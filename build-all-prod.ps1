@@ -7,19 +7,19 @@ $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 # List of solutions
 
 $solutionPaths = (
-    "framework"
+    #"framework",
     #"modules/users",
     #"modules/permission-management",
     #"modules/setting-management",
     #"modules/feature-management",
     #"modules/identity",
     #"modules/identityserver",
-    #"modules/tenant-management",
+    "modules/tenant-management",
     #"modules/account",
+    "modules/audit-logging"
+    #"modules/background-jobs"
     #"modules/docs",
     #"modules/blogging",
-    #"modules/audit-logging",
-    #"modules/background-jobs"
     #"modules/client-simulation"
     #"templates/mvc-module",
     #"templates/mvc",
@@ -32,7 +32,8 @@ $outputFolder = Join-Path $rootFolder "lib"
 foreach ($solutionPath in $solutionPaths) {    
     $solutionAbsPath = (Join-Path $rootFolder $solutionPath)
     Set-Location $solutionAbsPath
-    dotnet build -c Release -o "$outputFolder" --no-restore
+    #dotnet build -c Release -o "$outputFolder" -v d --no-restore --no-dependencies 
+    dotnet build -c Release -o "$outputFolder"
     if (-Not $?) {
         Write-Host ("Build failed for the solution: " + $solutionPath)
         #Set-Location $rootFolder
@@ -55,3 +56,5 @@ Remove-Item "*.DemoApp*.dll"
 Remove-Item "*.DemoApp*.pdb"
 Remove-Item "*.TestApp.dll"
 Remove-Item "*.TestApp.pdb"
+Remove-Item "*.TestBase.dll"
+Remove-Item "*.TestBase.pdb"

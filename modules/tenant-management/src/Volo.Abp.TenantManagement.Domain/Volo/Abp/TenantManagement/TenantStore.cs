@@ -15,7 +15,7 @@ namespace Volo.Abp.TenantManagement
         private readonly ICurrentTenant _currentTenant;
 
         public TenantStore(
-            ITenantRepository tenantRepository, 
+            ITenantRepository tenantRepository,
             IObjectMapper objectMapper,
             ICurrentTenant currentTenant)
         {
@@ -59,12 +59,12 @@ namespace Volo.Abp.TenantManagement
         protected virtual async Task<Tenant> FindByIdAsync(Guid id)
         {
             return await _tenantRepository.FindAsync(id);
-
+        }
         public TenantConfiguration Find(string name)
         {
             using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
             {
-                var tenant = _tenantRepository.FindByName(name);
+                var tenant = FindByName(name);
                 if (tenant == null)
                 {
                     return null;
@@ -78,7 +78,7 @@ namespace Volo.Abp.TenantManagement
         {
             using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
             {
-                var tenant = _tenantRepository.Find(id);
+                var tenant = FindById(id);
                 if (tenant == null)
                 {
                     return null;
@@ -88,32 +88,14 @@ namespace Volo.Abp.TenantManagement
             }
         }
 
-        public TenantConfiguration Find(string name)
+        protected virtual Tenant FindByName(string name)
         {
-            using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
-            {
-                var tenant = _tenantRepository.FindByName(name);
-                if (tenant == null)
-                {
-                    return null;
-                }
-
-                return _objectMapper.Map<Tenant, TenantConfiguration>(tenant);
-            }
+            return _tenantRepository.FindByName(name);
         }
 
-        public TenantConfiguration Find(Guid id)
+        protected virtual Tenant FindById(Guid id)
         {
-            using (_currentTenant.Change(null)) //TODO: No need this if we can implement to define host side (or tenant-independent) entities!
-            {
-                var tenant = _tenantRepository.Find(id);
-                if (tenant == null)
-                {
-                    return null;
-                }
-
-                return _objectMapper.Map<Tenant, TenantConfiguration>(tenant);
-            }
+            return _tenantRepository.Find(id);
         }
     }
 }
