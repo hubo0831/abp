@@ -42,5 +42,30 @@ namespace System
         {
             return list.Contains(item);
         }
+
+        /// <summary>强类型克隆</summary>
+        public static T TypedClone<T>(this T value)
+            where T : class
+        {
+            return value?.As<ICloneable>().Clone().As<T>();
+        }
+        /// <summary>对象转换</summary>
+        public static T ConvertTo<T>(this object value)
+        {
+            return (T)Convert.ChangeType(value, typeof(T));
+        }
+
+        /// <summary>转换为整数</summary>
+        public static int ToInt32<T>(this T value)
+            where T : IConvertible
+        {
+            return Convert.ToInt32(value);
+        }
+
+        /// <summary>生成紧缩字符串</summary>
+        public static string ToCompactString(this Guid value)
+        {
+            return value.ToString("N");
+        }
     }
 }

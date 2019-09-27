@@ -62,5 +62,11 @@ namespace System
                 }
             }
         }
+        /// <summary>加入异常数据</summary>
+        public static Exception WithData(this Exception ex, string name, object value)
+        {
+            ex.Data[name] = value;
+            return ex;
+        }
     }
 }
