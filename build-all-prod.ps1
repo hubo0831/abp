@@ -7,17 +7,17 @@ $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 # List of solutions
 
 $solutionPaths = (
-    #"framework",
-    #"modules/users",
-    #"modules/permission-management",
-    #"modules/setting-management",
-    #"modules/feature-management",
-    #"modules/identity",
-    #"modules/identityserver",
+    "framework",
+    "modules/users",
+    "modules/permission-management",
+    "modules/setting-management",
+    "modules/feature-management",
+    "modules/identity",
+    "modules/identityserver",
     "modules/tenant-management",
-    #"modules/account",
-    "modules/audit-logging"
-    #"modules/background-jobs"
+    "modules/account",
+    "modules/audit-logging",
+    "modules/background-jobs"
     #"modules/docs",
     #"modules/blogging",
     #"modules/client-simulation"
@@ -56,5 +56,5 @@ Remove-Item "*.DemoApp*.dll"
 Remove-Item "*.DemoApp*.pdb"
 Remove-Item "*.TestApp.dll"
 Remove-Item "*.TestApp.pdb"
-Remove-Item "*.TestBase.dll"
-Remove-Item "*.TestBase.pdb"
+#Remove-Item "*.TestBase.dll"
+#Remove-Item "*.TestBase.pdb"

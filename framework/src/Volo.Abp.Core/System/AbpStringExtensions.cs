@@ -456,5 +456,143 @@ namespace System
 
             return encoding.GetBytes(str);
         }
+
+        /// <summary>转换为Guid</summary>
+        public static Guid ToGuid(this string value)
+        {
+            return Guid.Parse(value);
+        }
+        /// <summary>Base64字符串转换为字节数组</summary>
+        public static byte[] ToBytesFromBase64String(this string content)
+        {
+            return Convert.FromBase64String(content);
+        }
+        /// <summary>字节数组转换为Base64字符串</summary>
+        public static string ToBase64String(this byte[] content)
+        {
+            return Convert.ToBase64String(content);
+        }
+        /// <summary>GBK代码页</summary>
+        public const int GBKCodePage = 936;
+        /// <summary>取汉字拼音的首字母</summary>
+        /// <param name="chineseName">汉字</param>
+        /// <returns>首字母</returns>
+        public static string GetPYCapitals(this string chineseName)
+        {
+            var i = 0;
+            ushort key;
+            var result = string.Empty;
+            var gbkBytes = Encoding.GetEncoding(GBKCodePage).GetBytes(chineseName);
+            while (i < gbkBytes.Length)
+            {
+                if (gbkBytes[i] <= 127)
+                {
+                    result += (char)gbkBytes[i];
+                    i++;
+                    continue;
+                }
+                #region 生成汉字拼音简码,取拼音首字母
+                key = (ushort)(gbkBytes[i] * 256 + gbkBytes[i + 1]);
+                if (key >= '\uB0A1' && key <= '\uB0C4')
+                {
+                    result += "A";
+                }
+                else if (key >= '\uB0C5' && key <= '\uB2C0')
+                {
+                    result += "B";
+                }
+                else if (key >= '\uB2C1' && key <= '\uB4ED')
+                {
+                    result += "C";
+                }
+                else if (key >= '\uB4EE' && key <= '\uB6E9')
+                {
+                    result += "D";
+                }
+                else if (key >= '\uB6EA' && key <= '\uB7A1')
+                {
+                    result += "E";
+                }
+                else if (key >= '\uB7A2' && key <= '\uB8C0')
+                {
+                    result += "F";
+                }
+                else if (key >= '\uB8C1' && key <= '\uB9FD')
+                {
+                    result += "G";
+                }
+                else if (key >= '\uB9FE' && key <= '\uBBF6')
+                {
+                    result += "H";
+                }
+                else if (key >= '\uBBF7' && key <= '\uBFA5')
+                {
+                    result += "J";
+                }
+                else if (key >= '\uBFA6' && key <= '\uC0AB')
+                {
+                    result += "K";
+                }
+                else if (key >= '\uC0AC' && key <= '\uC2E7')
+                {
+                    result += "L";
+                }
+                else if (key >= '\uC2E8' && key <= '\uC4C2')
+                {
+                    result += "M";
+                }
+                else if (key >= '\uC4C3' && key <= '\uC5B5')
+                {
+                    result += "N";
+                }
+                else if (key >= '\uC5B6' && key <= '\uC5BD')
+                {
+                    result += "O";
+                }
+                else if (key >= '\uC5BE' && key <= '\uC6D9')
+                {
+                    result += "P";
+                }
+                else if (key >= '\uC6DA' && key <= '\uC8BA')
+                {
+                    result += "Q";
+                }
+                else if (key >= '\uC8BB' && key <= '\uC8F5')
+                {
+                    result += "R";
+                }
+                else if (key >= '\uC8F6' && key <= '\uCBF9')
+                {
+                    result += "S";
+                }
+                else if (key >= '\uCBFA' && key <= '\uCDD9')
+                {
+                    result += "T";
+                }
+                else if (key >= '\uCDDA' && key <= '\uCEF3')
+                {
+                    result += "W";
+                }
+                else if (key >= '\uCEF4' && key <= '\uD1B8')
+                {
+                    result += "X";
+                }
+                else if (key >= '\uD1B9' && key <= '\uD4D0')
+                {
+                    result += "Y";
+                }
+                else if (key >= '\uD4D1' && key <= '\uD7F9')
+                {
+                    result += "Z";
+                }
+                else
+                {
+                    result += "?";
+                }
+                i += 2;
+                #endregion
+            }
+            return result;
+        }
     }
 }

@@ -59,5 +59,12 @@ namespace System.Collections.Generic
                 ? source.Where(predicate)
                 : source;
         }
+
+        /// <summary>克隆集合</summary>
+        public static IEnumerable<T> CloneCollection<T>(this IEnumerable<T> values)
+            where T : class
+        {
+            return values?.Select(e => e.TypedClone());
+        }
     }
 }

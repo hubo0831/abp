@@ -2,10 +2,13 @@ using System;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Volo.Abp.Domain.Entities;
+using Volo.Abp.Domain.Repositories;
 using Volo.Abp.Guids;
 using Volo.Abp.MultiTenancy;
 using Volo.Abp.ObjectMapping;
 using Volo.Abp.Timing;
+using Volo.Abp.Uow;
 
 namespace Volo.Abp.Domain.Services
 {
@@ -17,6 +20,18 @@ namespace Volo.Abp.Domain.Services
         protected T GetRequiredService<T>()
         {
             return this.ServiceProvider.GetRequiredService<T>();
+        }
+        /// <summary>获得实体仓储</summary>
+        protected IRepository<TEntity> GetRepository<TEntity>()
+            where TEntity : class, IEntity
+        {
+            return GetRequiredService<IRepository<TEntity>>();
+        }
+        /// <summary>获得实体仓储</summary>
+        protected IRepository<TEntity, TKey> GetRepository<TEntity, TKey>()
+            where TEntity : class, IEntity<TKey>
+        {
+            return GetRequiredService<IRepository<TEntity, TKey>>();
         }
         protected TService LazyGetRequiredService<TService>(ref TService reference)
         {
@@ -68,6 +83,12 @@ namespace Volo.Abp.Domain.Services
         {
             ObjectMapper.Map(source.GetType(), destination.GetType(), source, destination);
         }
+        /// <summary>工作单元管理器</summary>
+        private IUnitOfWorkManager _unitOfWorkManager;
+        /// <summary>工作单元管理器</summary>
+        protected IUnitOfWorkManager UnitOfWorkManager => LazyGetRequiredService(ref _unitOfWorkManager);
+        /// <summary>当前工作单元</summary>
+        protected IUnitOfWork CurrentUnitOfWork => UnitOfWorkManager?.Current;
 
         protected DomainService()
         {

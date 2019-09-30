@@ -114,5 +114,23 @@ namespace System.Collections.Generic
         {
             return dictionary.GetOrAdd(key, k => factory());
         }
+        /// <summary>字典加入一组元素</summary>
+        public static IDictionary<TKey, TValue> AddRange<TKey, TValue>(this IDictionary<TKey, TValue> source, IDictionary<TKey, TValue> values)
+        {
+            foreach (var pair in values)
+            {
+                source.Add(pair.Key, pair.Value);
+            }
+            return source;
+        }
+        /// <summary>字典加入一组元素</summary>
+        public static IDictionary AddRange<TKey, TValue>(this IDictionary source, IDictionary<TKey, TValue> values)
+        {
+            foreach (var pair in values)
+            {
+                source.Add(pair.Key, pair.Value);
+            }
+            return source;
+        }
     }
 }

@@ -65,5 +65,11 @@ namespace System
             AddTypeAndBaseTypesRecursively(types, type.BaseType, includeObject);
             types.Add(type);
         }
+
+        /// <summary>获得基础类型的类型代码</summary>
+        public static TypeCode GetTypeCode(this Type type)
+        {
+            return Type.GetTypeCode(type);
+        }
     }
 }
