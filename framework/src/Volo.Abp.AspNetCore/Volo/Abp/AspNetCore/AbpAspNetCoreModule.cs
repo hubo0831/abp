@@ -16,7 +16,7 @@ using Volo.Abp.VirtualFileSystem;
 namespace Volo.Abp.AspNetCore
 {
     [DependsOn(
-        typeof(AbpAuditingModule), 
+        typeof(AbpAuditingModule),
         typeof(AbpSecurityModule),
         typeof(AbpVirtualFileSystemModule),
         typeof(AbpUnitOfWorkModule),
@@ -31,7 +31,11 @@ namespace Volo.Abp.AspNetCore
     {
         public override void PreConfigureServices(ServiceConfigurationContext context)
         {
-            context.Services.AddConfiguration();
+            var options = context.Services.GetObjectOrNull<AbpApplicationCreationOptions>();
+            if (options == null || !options.UseDefaultConfiguration)
+            {
+                context.Services.AddConfiguration();
+            }
         }
 
         public override void ConfigureServices(ServiceConfigurationContext context)
