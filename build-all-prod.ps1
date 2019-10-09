@@ -7,17 +7,17 @@ $rootFolder = (Get-Item -Path "./" -Verbose).FullName
 # List of solutions
 
 $solutionPaths = (
-    "framework"
-    ,"modules/users"
-    ,"modules/permission-management"
-    ,"modules/setting-management"
-    ,"modules/feature-management"
-    ,"modules/identity"
-    ,"modules/identityserver"
-    ,"modules/tenant-management"
-    ,"modules/account"
-    ,"modules/audit-logging"
-    ,"modules/background-jobs"
+    "framework",
+    "modules/users",
+    "modules/permission-management",
+    "modules/setting-management",
+    "modules/feature-management",
+    "modules/identity",
+    "modules/identityserver",
+    "modules/tenant-management",
+    "modules/account",
+    "modules/audit-logging",
+    "modules/background-jobs"
     #"modules/docs",
     #"modules/blogging",
     #"modules/client-simulation"

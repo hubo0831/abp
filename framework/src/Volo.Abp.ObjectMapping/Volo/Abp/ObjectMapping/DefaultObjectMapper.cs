@@ -15,11 +15,16 @@ namespace Volo.Abp.ObjectMapping
             _serviceProvider = serviceProvider;
         }
 
-        public virtual TDestination Map<TSource, TDestination>(TSource source)
+        public virtual TDestination Map<TSource, TDestination>(TSource source, bool onlyAutoMap = false)
         {
             if (source == null)
             {
                 return default;
+            }
+
+            if (onlyAutoMap)
+            {
+                return AutoMap<TSource, TDestination>(source);
             }
 
             using (var scope = _serviceProvider.CreateScope())
@@ -43,7 +48,7 @@ namespace Volo.Abp.ObjectMapping
                     //TODO: Check if TDestination has a proper constructor which takes TSource
                     //TODO: Check if TDestination has an empty constructor (in this case, use MapFrom)
 
-                    return (TDestination) Activator.CreateInstance(typeof(TDestination), source);
+                    return (TDestination)Activator.CreateInstance(typeof(TDestination), source);
                 }
                 catch
                 {
@@ -54,11 +59,16 @@ namespace Volo.Abp.ObjectMapping
             return AutoMap<TSource, TDestination>(source);
         }
 
-        public virtual TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        public virtual TDestination Map<TSource, TDestination>(TSource source, TDestination destination, bool onlyAutoMap = false)
         {
             if (source == null)
             {
                 return default;
+            }
+
+            if (onlyAutoMap)
+            {
+                return AutoMap<TSource, TDestination>(source);
             }
 
             using (var scope = _serviceProvider.CreateScope())

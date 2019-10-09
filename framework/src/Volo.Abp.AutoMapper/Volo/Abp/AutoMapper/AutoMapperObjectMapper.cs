@@ -18,21 +18,21 @@ namespace Volo.Abp.AutoMapper
             MapperAccessor = mapperAccessor;
             Options = options.Value;
         }
-        public override TDestination Map<TSource, TDestination>(TSource source)
+        public override TDestination Map<TSource, TDestination>(TSource source, bool onlyAutoMap = false)
         {
-            if (Options.OnlyUseAutoMapper)
+            if (onlyAutoMap || Options.OnlyUseAutoMapper)
             {
                 return AutoMap<TSource, TDestination>(source);
             }
-            return base.Map<TSource, TDestination>(source);
+            return base.Map<TSource, TDestination>(source, onlyAutoMap);
         }
-        public override TDestination Map<TSource, TDestination>(TSource source, TDestination destination)
+        public override TDestination Map<TSource, TDestination>(TSource source, TDestination destination, bool onlyAutoMap = false)
         {
-            if (Options.OnlyUseAutoMapper)
+            if (onlyAutoMap || Options.OnlyUseAutoMapper)
             {
                 return AutoMap<TSource, TDestination>(source, destination);
             }
-            return base.Map<TSource, TDestination>(source, destination);
+            return base.Map<TSource, TDestination>(source, destination, onlyAutoMap);
         }
 
         protected override TDestination AutoMap<TSource, TDestination>(object source)

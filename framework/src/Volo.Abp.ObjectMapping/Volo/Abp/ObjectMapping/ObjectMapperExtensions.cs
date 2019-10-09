@@ -16,11 +16,11 @@ namespace Volo.Abp.ObjectMapping
                 if (method.Name == nameof(IObjectMapper.Map) && method.IsGenericMethodDefinition)
                 {
                     var parameters = method.GetParameters();
-                    if (parameters.Length == 1)
+                    if (parameters.Length == 2)
                     {
                         MapToNewObjectMethod = method;
                     }
-                    else if (parameters.Length == 2)
+                    else if (parameters.Length == 3)
                     {
                         MapToExistingObjectMethod = method;
                     }
@@ -28,18 +28,18 @@ namespace Volo.Abp.ObjectMapping
             }
         }
 
-        public static object Map(this IObjectMapper objectMapper, Type sourceType, Type destinationType, object source)
+        public static object Map(this IObjectMapper objectMapper, Type sourceType, Type destinationType, object source, bool onlyAutoMap = false)
         {
             return MapToNewObjectMethod
                 .MakeGenericMethod(sourceType, destinationType)
-                .Invoke(objectMapper, new[] { source });
+                .Invoke(objectMapper, new[] { source, onlyAutoMap });
         }
 
-        public static object Map(this IObjectMapper objectMapper, Type sourceType, Type destinationType, object source, object destination)
+        public static object Map(this IObjectMapper objectMapper, Type sourceType, Type destinationType, object source, object destination, bool onlyAutoMap = false)
         {
             return MapToExistingObjectMethod
                 .MakeGenericMethod(sourceType, destinationType)
-                .Invoke(objectMapper, new[] { source, destination });
+                .Invoke(objectMapper, new[] { source, destination, onlyAutoMap });
         }
     }
 }

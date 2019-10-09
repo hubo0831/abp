@@ -44,6 +44,17 @@ namespace Volo.Abp.AspNetCore.Mvc
 
         public IObjectMapper ObjectMapper => LazyGetRequiredService(ref _objectMapper);
         private IObjectMapper _objectMapper;
+        /// <summary>对象映射</summary>
+        protected T MapTo<T>(object source, bool onlyAutoMap = false)
+            where T : class
+        {
+            return ObjectMapper.Map(source.GetType(), typeof(T), source, onlyAutoMap).As<T>();
+        }
+        /// <summary>对象映射</summary>
+        protected void MapTo(object source, object destination, bool onlyAutoMap = false)
+        {
+            ObjectMapper.Map(source.GetType(), destination.GetType(), source, destination, onlyAutoMap);
+        }
 
         public IGuidGenerator GuidGenerator => LazyGetRequiredService(ref _guidGenerator);
         private IGuidGenerator _guidGenerator;

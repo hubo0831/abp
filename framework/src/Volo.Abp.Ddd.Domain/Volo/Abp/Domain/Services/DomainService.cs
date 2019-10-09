@@ -73,15 +73,15 @@ namespace Volo.Abp.Domain.Services
         /// <summary>内存缓存</summary>
         protected IObjectMapper ObjectMapper => LazyGetRequiredService(ref _objectMapper);
         /// <summary>对象映射</summary>
-        protected T MapTo<T>(object source)
+        protected T MapTo<T>(object source, bool onlyAutoMap = false)
             where T : class
         {
-            return ObjectMapper.Map(source.GetType(), typeof(T), source).As<T>();
+            return ObjectMapper.Map(source.GetType(), typeof(T), source, onlyAutoMap).As<T>();
         }
         /// <summary>对象映射</summary>
-        protected void MapTo(object source, object destination)
+        protected void MapTo(object source, object destination, bool onlyAutoMap = false)
         {
-            ObjectMapper.Map(source.GetType(), destination.GetType(), source, destination);
+            ObjectMapper.Map(source.GetType(), destination.GetType(), source, destination, onlyAutoMap);
         }
         /// <summary>工作单元管理器</summary>
         private IUnitOfWorkManager _unitOfWorkManager;
