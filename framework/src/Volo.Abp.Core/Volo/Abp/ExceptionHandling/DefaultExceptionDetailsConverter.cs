@@ -18,17 +18,19 @@ namespace Volo.Abp.ExceptionHandling
         public string ConvertTo(Exception ex)
         {
             var exType = ex.GetType();
-            if (!Options.ConvertContributors.TryGetValue(exType, out var contributor))
+            var contributors = Options.ConvertContributors;
+            if (!contributors.TryGetValue(exType, out var contributor))
             {
                 var exTypes = new List<Type> { exType };
                 exType = exType.BaseType;
                 while (true)
                 {
-                    if (Options.ConvertContributors.TryGetValue(exType, out contributor))
+                    if (contributors.TryGetValue(exType, out contributor))
                     {
                         foreach (var item in exTypes)
                         {
-                            Options.ConvertContributors.Add(item, contributor);
+                            if (contributors.ContainsKey(item)) continue;
+                            contributors.Add(item, contributor);
                         }
                         break;
                     }
