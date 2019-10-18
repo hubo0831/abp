@@ -14,6 +14,8 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
     {
         IMongoDatabase Database { get; }
 
+        IClientSessionHandle Session { get; }
+
         IMongoCollection<TEntity> Collection { get; }
 
         IMongoQueryable<TEntity> GetMongoQueryable();

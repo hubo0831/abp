@@ -6,6 +6,8 @@ namespace Volo.Abp.MongoDB
     {
         IMongoDatabase Database { get; }
 
+        IClientSessionHandle Session { get; }
+
         IMongoCollection<T> Collection<T>();
     }
 }

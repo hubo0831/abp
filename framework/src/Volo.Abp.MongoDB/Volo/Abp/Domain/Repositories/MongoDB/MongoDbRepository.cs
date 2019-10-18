@@ -28,6 +28,8 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
     {
         public virtual IMongoCollection<TEntity> Collection => DbContext.Collection<TEntity>();
 
+        public virtual IClientSessionHandle Session => DbContext.Session;
+
         public virtual IMongoDatabase Database => DbContext.Database;
 
         public virtual TMongoDbContext DbContext => DbContextProvider.GetDbContext();
@@ -62,7 +64,8 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
             AsyncHelper.RunSync(() => ApplyAbpConceptsForAddedEntityAsync(entity));
 
-            Collection.InsertOne(entity);
+            var dbContext = this.DbContext;
+            dbContext.Collection<TEntity>().InsertOne(dbContext.Session, entity);
 
             return entity;
         }
@@ -73,8 +76,9 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             CancellationToken cancellationToken = default)
         {
             await ApplyAbpConceptsForAddedEntityAsync(entity);
-
-            await Collection.InsertOneAsync(
+            var dbContext = this.DbContext;
+            await dbContext.Collection<TEntity>().InsertOneAsync(
+                dbContext.Session,
                 entity,
                 cancellationToken: GetCancellationToken(cancellationToken)
             );
@@ -100,7 +104,9 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
             var oldConcurrencyStamp = SetNewConcurrencyStamp(entity);
 
-            var result = Collection.ReplaceOne(
+            var dbContext = this.DbContext;
+            var result = dbContext.Collection<TEntity>().ReplaceOne(
+                dbContext.Session,
                 CreateEntityFilter(entity, true, oldConcurrencyStamp),
                 entity
             );
@@ -134,7 +140,9 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
             var oldConcurrencyStamp = SetNewConcurrencyStamp(entity);
 
-            var result = await Collection.ReplaceOneAsync(
+            var dbContext = this.DbContext;
+            var result = await dbContext.Collection<TEntity>().ReplaceOneAsync(
+                dbContext.Session,
                 CreateEntityFilter(entity, true, oldConcurrencyStamp),
                 entity,
                 cancellationToken: GetCancellationToken(cancellationToken)
@@ -153,10 +161,12 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             AsyncHelper.RunSync(() => ApplyAbpConceptsForDeletedEntityAsync(entity));
             var oldConcurrencyStamp = SetNewConcurrencyStamp(entity);
 
+            var dbContext = this.DbContext;
             if (entity is ISoftDelete softDeleteEntity)
             {
                 softDeleteEntity.IsDeleted = true;
-                var result = Collection.ReplaceOne(
+                var result = dbContext.Collection<TEntity>().ReplaceOne(
+                    dbContext.Session,
                     CreateEntityFilter(entity, true, oldConcurrencyStamp),
                     entity
                 );
@@ -168,7 +178,8 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             }
             else
             {
-                var result = Collection.DeleteOne(
+                var result = dbContext.Collection<TEntity>().DeleteOne(
+                    dbContext.Session,
                     CreateEntityFilter(entity, true, oldConcurrencyStamp)
                 );
 
@@ -187,10 +198,12 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             await ApplyAbpConceptsForDeletedEntityAsync(entity);
             var oldConcurrencyStamp = SetNewConcurrencyStamp(entity);
 
+            var dbContext = this.DbContext;
             if (entity is ISoftDelete softDeleteEntity)
             {
                 softDeleteEntity.IsDeleted = true;
-                var result = await Collection.ReplaceOneAsync(
+                var result = await dbContext.Collection<TEntity>().ReplaceOneAsync(
+                    dbContext.Session,
                     CreateEntityFilter(entity, true, oldConcurrencyStamp),
                     entity,
                     cancellationToken: GetCancellationToken(cancellationToken)
@@ -203,8 +216,10 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             }
             else
             {
-                var result = await Collection.DeleteOneAsync(
+                var result = await dbContext.Collection<TEntity>().DeleteOneAsync(
+                    dbContext.Session,
                     CreateEntityFilter(entity, true, oldConcurrencyStamp),
+                    null,
                     GetCancellationToken(cancellationToken)
                 );
 
@@ -414,14 +429,16 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
         protected async Task<TEntity> FindOneInternalAsync(FilterDefinition<TEntity> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
         {
-            using (var cursor = await this.Collection.FindAsync(filter, options, cancellationToken))
+            var dbContext = this.DbContext;
+            using (var cursor = await dbContext.Collection<TEntity>().FindAsync(dbContext.Session, filter, options, cancellationToken))
             {
                 return await cursor.FirstOrDefaultAsync();
             }
         }
         protected async Task<List<TEntity>> FindInternalAsync(FilterDefinition<TEntity> filter, FindOptions<TEntity, TEntity> options = null, CancellationToken cancellationToken = default)
         {
-            using (var cursor = await this.Collection.FindAsync(filter, options, cancellationToken))
+            var dbContext = this.DbContext;
+            using (var cursor = await dbContext.Collection<TEntity>().FindAsync(dbContext.Session, filter, options, cancellationToken))
             {
                 return await cursor.ToListAsync();
             }
@@ -477,10 +494,12 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             {
                 await ApplyAbpConceptsForAddedEntityAsync(entity);
             }
-            await this.Collection.InsertManyAsync(entities, options, cancellationToken);
+            var dbContext = this.DbContext;
+            await dbContext.Collection<TEntity>().InsertManyAsync(dbContext.Session, entities, options, cancellationToken);
         }
         public virtual async Task DeleteAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
         {
+            var dbContext = this.DbContext;
             foreach (var entity in entities)
             {
                 await DeleteAsync(entity, false, cancellationToken);
@@ -489,7 +508,8 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
         public virtual async Task FastDeleteAsync(Expression<Func<TEntity, bool>> filter, CancellationToken cancellationToken = default)
         {
             var filters = CreateEntityFilter(filter, true);
-            await this.Collection.DeleteManyAsync(filters, cancellationToken);
+            var dbContext = this.DbContext;
+            await dbContext.Collection<TEntity>().DeleteManyAsync(dbContext.Session, filters, null, cancellationToken);
         }
     }
 
@@ -535,12 +555,14 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
         public virtual TEntity Find(TKey id, bool includeDetails = true)
         {
-            return Collection.Find(CreateEntityFilter(id, true)).FirstOrDefault();
+            var dbContext = this.DbContext;
+            return dbContext.Collection<TEntity>().Find(dbContext.Session, CreateEntityFilter(id, true)).FirstOrDefault();
         }
 
         public virtual void Delete(TKey id, bool autoSave = false)
         {
-            Collection.DeleteOne(CreateEntityFilter(id));
+            var dbContext = this.DbContext;
+            dbContext.Collection<TEntity>().DeleteOne(dbContext.Session, CreateEntityFilter(id));
         }
 
         public virtual Task DeleteAsync(
@@ -548,8 +570,11 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
             bool autoSave = false,
             CancellationToken cancellationToken = default)
         {
-            return Collection.DeleteOneAsync(
+            var dbContext = this.DbContext;
+            return dbContext.Collection<TEntity>().DeleteOneAsync(
+                dbContext.Session,
                 CreateEntityFilter(id),
+                null,
                 GetCancellationToken(cancellationToken)
             );
         }

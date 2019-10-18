@@ -9,6 +9,7 @@ namespace Volo.Abp.MongoDB
         public IMongoModelSource ModelSource { get; set; }
 
         public IMongoDatabase Database { get; private set; }
+        public IClientSessionHandle Session { get; private set; }
 
         protected internal virtual void CreateModel(IMongoModelBuilder modelBuilder)
         {
@@ -18,6 +19,7 @@ namespace Volo.Abp.MongoDB
         public virtual void InitializeDatabase(IMongoDatabase database)
         {
             Database = database;
+            Session = database.Client.StartSession();
         }
 
         public virtual IMongoCollection<T> Collection<T>()
