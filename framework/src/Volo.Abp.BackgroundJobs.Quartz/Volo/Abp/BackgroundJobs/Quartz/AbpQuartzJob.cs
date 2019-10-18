@@ -8,7 +8,7 @@ using Quartz;
 using Volo.Abp.Domain.Services;
 using Volo.Abp.Uow;
 
-namespace Moral.BackgroundJobs
+namespace Volo.Abp.BackgroundJobs.Quartz
 {
     /// <summary>Quartz任务基类</summary>
     public abstract class AbpQuartzJob : DomainService, IJob
