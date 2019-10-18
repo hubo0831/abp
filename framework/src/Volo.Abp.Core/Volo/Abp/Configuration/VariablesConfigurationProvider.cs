@@ -18,6 +18,7 @@ namespace Volo.Abp.Configuration
                 {"ServiceName",  GetServiceName},
                 {"HostIP",  GetHostIP},
                 {"HostPort",  GetHostPort},
+                {"ProcessorCount",  GetProcessorCount},
             };
         }
         /// <summary>配置节键</summary>
@@ -59,6 +60,11 @@ namespace Volo.Abp.Configuration
         {
             var url = new Uri(this.Configuration[ServerUrlsKey]);
             return url.Port.ToString();
+        }
+        /// <summary>获得处理器数量</summary>
+        private string GetProcessorCount()
+        {
+            return Environment.ProcessorCount.ToString();
         }
     }
 }
