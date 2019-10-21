@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-
+using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -49,17 +49,42 @@ namespace Volo.Abp.Configuration
         {
             return this.Configuration[HostDefaults.ApplicationKey];
         }
+        /// <summary>默认主机IP</summary>
+        private string HostIP { get; set; }
+        /// <summary>默认主机端口</summary>
+        private string HostPort { get; set; }
         /// <summary>获得默认主机IP</summary>
         private string GetHostIP()
         {
-            var url = new Uri(this.Configuration[ServerUrlsKey]);
-            return url.Host;
+            if (this.HostIP == null)
+            {
+                ResolveServerUrl();
+            }
+            return this.HostIP;
         }
         /// <summary>获得默认主机端口</summary>
         private string GetHostPort()
         {
-            var url = new Uri(this.Configuration[ServerUrlsKey]);
-            return url.Port.ToString();
+            if (this.HostPort == null)
+            {
+                ResolveServerUrl();
+            }
+            return this.HostPort;
+        }
+        /// <summary>解析服务URL</summary>
+        private void ResolveServerUrl()
+        {
+            this.HostIP = string.Empty;
+            this.HostPort = string.Empty;
+            var urls = this.Configuration[ServerUrlsKey]?.Split(";", StringSplitOptions.RemoveEmptyEntries);
+            if (urls.IsNullOrEmpty()) return;
+            foreach (var url in urls)
+            {
+                if (!Uri.TryCreate(url, UriKind.Absolute, out var result)) continue;
+                this.HostIP = result.Host;
+                this.HostPort = result.Port.ToString();
+                break;
+            }
         }
         /// <summary>获得处理器数量</summary>
         private string GetProcessorCount()
