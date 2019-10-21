@@ -42,7 +42,7 @@ foreach ($solutionPath in $solutionPaths) {
 }
 
 Set-Location $outputFolder
-#Remove-Item -Recurse "pages"
+Remove-Item -Recurse "Properties"
 Remove-Item -Recurse "refs"
 Remove-Item "abp*"
 Remove-Item "Simple*"
