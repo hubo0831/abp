@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Net.Sockets;
+using System.Text.RegularExpressions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 
@@ -12,7 +15,7 @@ namespace Volo.Abp.Configuration
         /// <summary>变量配置提供者</summary>
         public VariablesConfigurationProvider()
         {
-            this.Builders = new Dictionary<string, Func<string>>(StringComparer.OrdinalIgnoreCase)
+            this.Builders = new Dictionary<string, Func<string, string>>(StringComparer.OrdinalIgnoreCase)
             {
                 {"ApplicationName",  GetServiceName},
                 {"ServiceName",  GetServiceName},
@@ -26,7 +29,7 @@ namespace Volo.Abp.Configuration
         /// <summary>服务器URL键(WebHostDefaults.ServerUrlsKey)</summary>
         private static readonly string ServerUrlsKey = "urls";
         /// <summary>配置节键</summary>
-        private Dictionary<string, Func<string>> Builders { get; }
+        private Dictionary<string, Func<string, string>> Builders { get; }
         /// <summary>配置</summary>
         public IConfiguration Configuration { get; set; }
         /// <summary>加载</summary>
@@ -38,14 +41,14 @@ namespace Volo.Abp.Configuration
                 var key = child.Key;
                 var fullKey = $"{SectionKey}:{key}";
                 var value = this.Configuration[fullKey];
-                if (!value.IsNullOrEmpty()) continue;
+                if (!value.IsNullOrEmpty() && !value.StartsWith("$")) continue;
                 var builder = this.Builders.GetOrDefault(key);
                 if (builder == null) continue;
-                Set(fullKey, builder());
+                Set(fullKey, builder(value));
             }
         }
         /// <summary>获得默认服务名</summary>
-        private string GetServiceName()
+        private string GetServiceName(string value)
         {
             return this.Configuration[HostDefaults.ApplicationKey];
         }
@@ -54,25 +57,25 @@ namespace Volo.Abp.Configuration
         /// <summary>默认主机端口</summary>
         private string HostPort { get; set; }
         /// <summary>获得默认主机IP</summary>
-        private string GetHostIP()
+        private string GetHostIP(string value)
         {
             if (this.HostIP == null)
             {
-                ResolveServerUrl();
+                ResolveServerUrl(value);
             }
             return this.HostIP;
         }
         /// <summary>获得默认主机端口</summary>
-        private string GetHostPort()
+        private string GetHostPort(string value)
         {
             if (this.HostPort == null)
             {
-                ResolveServerUrl();
+                ResolveServerUrl(value);
             }
             return this.HostPort;
         }
         /// <summary>解析服务URL</summary>
-        private void ResolveServerUrl()
+        private void ResolveServerUrl(string value)
         {
             this.HostIP = string.Empty;
             this.HostPort = string.Empty;
@@ -80,14 +83,36 @@ namespace Volo.Abp.Configuration
             if (urls.IsNullOrEmpty()) return;
             foreach (var url in urls)
             {
-                if (!Uri.TryCreate(url, UriKind.Absolute, out var result)) continue;
-                this.HostIP = result.Host;
-                this.HostPort = result.Port.ToString();
+                var match = Regex.Match(url, "https?://(?<ip>[^:]+):(?<port>\\d+)");
+                if (!match.Success) continue;
+                this.HostIP = match.Groups["ip"].Value;
+                this.HostPort = match.Groups["port"].Value;
+                if (this.HostIP == "*")
+                {
+                    var hostName = Dns.GetHostName();
+                    var ipAddresses = Dns.GetHostAddresses(hostName);
+                    if (value != null && value.StartsWith("$"))
+                    {
+                        var ipPrefix = value.Substring(1);
+                        foreach (var ipAddress in ipAddresses)
+                        {
+                            var ip = ipAddress.ToString();
+                            if (!ip.StartsWith(ipPrefix)) continue;
+                            this.HostIP = ip;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        var first = ipAddresses.FirstOrDefault(e => e.AddressFamily == AddressFamily.InterNetwork);
+                        if (first != null) this.HostIP = first.ToString();
+                    }
+                }
                 break;
             }
         }
         /// <summary>获得处理器数量</summary>
-        private string GetProcessorCount()
+        private string GetProcessorCount(string value)
         {
             return Environment.ProcessorCount.ToString();
         }
