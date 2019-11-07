@@ -28,7 +28,7 @@ $solutionPaths = (
 )
 
 # Build all solutions
-$outputFolder = Join-Path $rootFolder "lib"
+$outputFolder = Join-Path $rootFolder "lib2"
 foreach ($solutionPath in $solutionPaths) {    
     $solutionAbsPath = (Join-Path $rootFolder $solutionPath)
     Set-Location $solutionAbsPath
