@@ -16,6 +16,7 @@ using Volo.Abp.EventBus.Local;
 using Volo.Abp.Guids;
 using Volo.Abp.MongoDB;
 using Volo.Abp.MultiTenancy;
+using Volo.Abp.Reflection;
 using Volo.Abp.Threading;
 
 namespace Volo.Abp.Domain.Repositories.MongoDB
@@ -332,14 +333,30 @@ namespace Volo.Abp.Domain.Repositories.MongoDB
 
         protected virtual void CheckAndSetId(TEntity entity)
         {
-            if (entity is IEntity<Guid> entityWithGuidId && entityWithGuidId.Id == default)
+            if (entity is IEntity<Guid> entityWithGuidId)
             {
-                entityWithGuidId.Id = GuidGenerator.Create();
+                TrySetGuidId(entityWithGuidId);
             }
-            else if (entity is IEntity<ObjectId> entityWithObjectId && entityWithObjectId.Id == default)
+            else if (entity is IEntity<ObjectId> entityWithObjectId)
             {
-                entityWithObjectId.Id = ObjectId.GenerateNewId();
+                if (entityWithObjectId.Id == default)
+                {
+                    EntityHelper.TrySetId(entityWithObjectId, () => ObjectId.GenerateNewId(), true);
+                }
             }
+        }
+        protected virtual void TrySetGuidId(IEntity<Guid> entity)
+        {
+            if (entity.Id != default)
+            {
+                return;
+            }
+
+            EntityHelper.TrySetId(
+                entity,
+                () => GuidGenerator.Create(),
+                true
+            );
         }
         protected virtual void CheckAndSetConcurrencyStamp(TEntity entity)
         {

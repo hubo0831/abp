@@ -17,7 +17,7 @@ namespace Volo.Abp
         /// <summary>默认配置</summary>
         public IConfiguration DefaultConfiguration { get; set; }
         /// <summary>获得默认主机环境</summary>
-        public IHostingEnvironment DefaultHostingEnvironment { get; set; }
+        public IHostEnvironment DefaultHostEnvironment { get; set; }
 
         public ApplicationInitializationContext([NotNull] IServiceProvider serviceProvider)
         {
@@ -25,7 +25,7 @@ namespace Volo.Abp
 
             ServiceProvider = serviceProvider;
             DefaultConfiguration = serviceProvider.GetRequiredService<IConfiguration>();
-            DefaultHostingEnvironment = serviceProvider.GetRequiredService<IHostingEnvironment>();
+            DefaultHostEnvironment = serviceProvider.GetRequiredService<IHostEnvironment>();
         }
     }
 }

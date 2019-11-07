@@ -13,7 +13,8 @@ namespace Volo.Abp.AspNetCore.Mvc.Json
         /// <summary>获得JSON对象解析器</summary>
         public static IContractResolver GetMvcJsonContractResolver(this IServiceProvider serviceProvider)
         {
-            return serviceProvider.GetRequiredService<IOptions<MvcJsonOptions>>().Value.SerializerSettings.ContractResolver;
+            throw new NotImplementedException();
+            //return serviceProvider.GetRequiredService<IOptions<MvcJsonOptions>>().Value.SerializerSettings.ContractResolver;
         }
         /// <summary>获得JSON对象契约</summary>
         public static JsonObjectContract GetObjectContract<T>(this IContractResolver contractResolver)
