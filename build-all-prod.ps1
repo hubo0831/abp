@@ -42,19 +42,25 @@ foreach ($solutionPath in $solutionPaths) {
 }
 
 Set-Location $outputFolder
-Remove-Item -Recurse "Properties"
-Remove-Item -Recurse "refs"
-Remove-Item "abp*"
-Remove-Item "Simple*"
-Remove-Item "System.*"
-Remove-Item "xunit.*"
 Remove-Item "*.json"
 Remove-Item "*.config"
 Remove-Item "*.Tests*.dll"
 Remove-Item "*.Tests*.pdb"
+Remove-Item "*.Demo*.exe"
 Remove-Item "*.Demo*.dll"
 Remove-Item "*.Demo*.pdb"
 Remove-Item "*.TestApp.dll"
 Remove-Item "*.TestApp.pdb"
 #Remove-Item "*.TestBase.dll"
 #Remove-Item "*.TestBase.pdb"
+
+$files = Get-Item -Path "*"
+
+foreach ($file in $files) {    
+    if ($file -is [IO.DirectoryInfo]){
+        Remove-Item -Recurse $file
+    }
+    elseif (-Not $file.Name.StartsWith("Volo.Abp")) {
+        Remove-Item $file
+    }
+}
