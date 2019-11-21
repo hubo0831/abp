@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@angular/core'), require('@abp/ng.core'), require('@abp/ng.theme.shared'), require('@ngxs/store')) :
     typeof define === 'function' && define.amd ? define('@abp/ng.setting-management.config', ['exports', '@angular/core', '@abp/ng.core', '@abp/ng.theme.shared', '@ngxs/store'], factory) :
     (global = global || self, factory((global.abp = global.abp || {}, global.abp.ng = global.abp.ng || {}, global.abp.ng['setting-management'] = global.abp.ng['setting-management'] || {}, global.abp.ng['setting-management'].config = {}), global.ng.core, global.ng_core, global.ng_theme_shared, global.store));
-}(this, function (exports, core, ng_core, ng_theme_shared, store) { 'use strict';
+}(this, (function (exports, core, ng_core, ng_theme_shared, store) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -203,6 +203,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/services/setting-management-config.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var SettingManagementConfigService = /** @class */ (function () {
@@ -214,6 +215,7 @@
                 name: 'AbpSettingManagement::Settings',
                 path: 'setting-management',
                 parentName: 'AbpUiNavigation::Menu:Administration',
+                requiredPolicy: 'AbpAccount.SettingManagement',
                 layout: "application" /* application */,
                 order: 6,
                 iconClass: 'fa fa-cog',
@@ -252,6 +254,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/setting-management-config.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ɵ0 = ng_core.noop;
@@ -271,5 +274,5 @@
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=abp-ng.setting-management.config.umd.js.map

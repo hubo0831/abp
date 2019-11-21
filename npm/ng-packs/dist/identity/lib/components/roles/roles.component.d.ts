@@ -1,6 +1,6 @@
 import { ABP } from '@abp/ng.core';
 import { ConfirmationService } from '@abp/ng.theme.shared';
-import { TemplateRef, OnInit } from '@angular/core';
+import { OnInit, ElementRef } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
 import { Store } from '@ngxs/store';
 import { Observable } from 'rxjs';
@@ -21,16 +21,16 @@ export declare class RolesComponent implements OnInit {
     modalBusy: boolean;
     sortOrder: string;
     sortKey: string;
-    modalContent: TemplateRef<any>;
+    formRef: ElementRef<HTMLFormElement>;
     constructor(confirmationService: ConfirmationService, fb: FormBuilder, store: Store);
     ngOnInit(): void;
-    onSearch(value: any): void;
     createForm(): void;
     openModal(): void;
-    onAdd(): void;
-    onEdit(id: string): void;
+    add(): void;
+    edit(id: string): void;
     save(): void;
     delete(id: string, name: string): void;
     onPageChange(data: any): void;
     get(): void;
+    onClickSaveButton(): void;
 }

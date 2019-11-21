@@ -10,8 +10,9 @@ export declare class PersonalSettingsComponent implements OnInit {
     private toasterService;
     profile$: Observable<Profile.Response>;
     form: FormGroup;
+    inProgress: boolean;
     constructor(fb: FormBuilder, store: Store, toasterService: ToasterService);
+    ngOnInit(): void;
     buildForm(): void;
     submit(): void;
-    ngOnInit(): void;
 }

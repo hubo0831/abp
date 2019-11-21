@@ -8,6 +8,7 @@ export declare class ChangePasswordComponent implements OnInit {
     private store;
     private toasterService;
     form: FormGroup;
+    inProgress: boolean;
     mapErrorsFn: Validation.MapErrorsFn;
     constructor(fb: FormBuilder, store: Store, toasterService: ToasterService);
     ngOnInit(): void;

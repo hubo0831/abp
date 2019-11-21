@@ -2,7 +2,7 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@abp/ng.core'), require('@angular/core'), require('@angular/router'), require('@abp/ng.theme.shared')) :
     typeof define === 'function' && define.amd ? define('@abp/ng.account.config', ['exports', '@abp/ng.core', '@angular/core', '@angular/router', '@abp/ng.theme.shared'], factory) :
     (global = global || self, factory((global.abp = global.abp || {}, global.abp.ng = global.abp.ng || {}, global.abp.ng.account = global.abp.ng.account || {}, global.abp.ng.account.config = {}), global.ng_core, global.ng.core, global.ng.router, global.ng_theme_shared));
-}(this, function (exports, ng_core, core, router, ng_theme_shared) { 'use strict';
+}(this, (function (exports, ng_core, core, router, ng_theme_shared) { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -203,6 +203,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/services/account-config.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AccountConfigService = /** @class */ (function () {
@@ -249,6 +250,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/account-config.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /**
@@ -310,5 +312,5 @@
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=abp-ng.account.config.umd.js.map

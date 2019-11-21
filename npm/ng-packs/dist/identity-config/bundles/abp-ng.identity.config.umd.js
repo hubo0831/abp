@@ -2,10 +2,11 @@
     typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@abp/ng.core'), require('@angular/core'), require('@angular/router')) :
     typeof define === 'function' && define.amd ? define('@abp/ng.identity.config', ['exports', '@abp/ng.core', '@angular/core', '@angular/router'], factory) :
     (global = global || self, factory((global.abp = global.abp || {}, global.abp.ng = global.abp.ng || {}, global.abp.ng.identity = global.abp.ng.identity || {}, global.abp.ng.identity.config = {}), global.ng_core, global.ng.core, global.ng.router));
-}(this, function (exports, ng_core, core, router) { 'use strict';
+}(this, (function (exports, ng_core, core, router) { 'use strict';
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/services/identity-config.service.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var IdentityConfigService = /** @class */ (function () {
@@ -18,6 +19,7 @@
                     path: '',
                     order: 1,
                     wrapper: true,
+                    iconClass: 'fa fa-wrench',
                 },
                 {
                     name: 'AbpIdentity::Menu:IdentityManagement',
@@ -27,8 +29,8 @@
                     layout: "application" /* application */,
                     iconClass: 'fa fa-id-card-o',
                     children: [
-                        { path: 'roles', name: 'AbpIdentity::Roles', order: 2, requiredPolicy: 'AbpIdentity.Roles' },
-                        { path: 'users', name: 'AbpIdentity::Users', order: 1, requiredPolicy: 'AbpIdentity.Users' },
+                        { path: 'roles', name: 'AbpIdentity::Roles', order: 1, requiredPolicy: 'AbpIdentity.Roles' },
+                        { path: 'users', name: 'AbpIdentity::Users', order: 2, requiredPolicy: 'AbpIdentity.Users' },
                     ],
                 },
             ]);
@@ -61,6 +63,7 @@
 
     /**
      * @fileoverview added by tsickle
+     * Generated from: lib/identity-config.module.ts
      * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ɵ0 = ng_core.noop;
@@ -80,5 +83,5 @@
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=abp-ng.identity.config.umd.js.map
