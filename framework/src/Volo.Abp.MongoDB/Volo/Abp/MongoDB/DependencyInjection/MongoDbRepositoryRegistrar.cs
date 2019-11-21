@@ -6,9 +6,9 @@ using Volo.Abp.Domain.Repositories.MongoDB;
 
 namespace Volo.Abp.MongoDB.DependencyInjection
 {
-    public class MongoDbRepositoryRegistrar : RepositoryRegistrarBase<MongoDbContextRegistrationOptions>
+    public class MongoDbRepositoryRegistrar : RepositoryRegistrarBase<AbpMongoDbContextRegistrationOptions>
     {
-        public MongoDbRepositoryRegistrar(MongoDbContextRegistrationOptions options)
+        public MongoDbRepositoryRegistrar(AbpMongoDbContextRegistrationOptions options)
             : base(options)
         {
 

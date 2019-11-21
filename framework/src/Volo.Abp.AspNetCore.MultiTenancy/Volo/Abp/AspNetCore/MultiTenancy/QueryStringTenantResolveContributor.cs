@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using Microsoft.AspNetCore.Http;
+﻿using Microsoft.AspNetCore.Http;
 using Volo.Abp.MultiTenancy;
 
 namespace Volo.Abp.AspNetCore.MultiTenancy
@@ -18,12 +16,7 @@ namespace Volo.Abp.AspNetCore.MultiTenancy
                 return null;
             }
 
-            var tenantIdOrName = httpContext.Request.Query[context.GetAspNetCoreMultiTenancyOptions().TenantKey];
-            if (!tenantIdOrName.IsNullOrEmpty())
-            {
-                return null;
-            }
-            return WebUtility.UrlDecode(tenantIdOrName);
+            return httpContext.Request.Query[context.GetAbpAspNetCoreMultiTenancyOptions().TenantKey];
         }
     }
 }

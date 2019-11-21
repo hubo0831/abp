@@ -1,30 +1,84 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output, ViewChild, ElementRef, Renderer2, OnInit } from '@angular/core';
+import { ABP } from '@abp/ng.core';
 
 @Component({
   selector: 'abp-button',
+  // tslint:disable-next-line: component-max-inline-declarations
   template: `
-    <button [attr.type]="type" [ngClass]="buttonClass" [disabled]="loading || disabled">
+    <button
+      #button
+      [id]="buttonId"
+      [attr.type]="buttonType"
+      [ngClass]="buttonClass"
+      [disabled]="loading || disabled"
+      (click)="onClick($event)"
+      (focus)="onFocus($event)"
+      (blur)="onBlur($event)"
+    >
       <i [ngClass]="icon" class="mr-1"></i><ng-content></ng-content>
     </button>
   `,
 })
-export class ButtonComponent {
+export class ButtonComponent implements OnInit {
   @Input()
-  buttonClass: string = 'btn btn-primary';
+  buttonId = '';
 
   @Input()
-  type: string = 'button';
+  buttonClass = 'btn btn-primary';
+
+  @Input()
+  buttonType = 'button';
 
   @Input()
   iconClass: string;
 
   @Input()
-  loading: boolean = false;
+  loading = false;
 
   @Input()
-  disabled: boolean = false;
+  disabled = false;
+
+  @Input()
+  attributes: ABP.Dictionary<string>;
+
+  // tslint:disable-next-line: no-output-native
+  @Output() readonly click = new EventEmitter<MouseEvent>();
+
+  // tslint:disable-next-line: no-output-native
+  @Output() readonly focus = new EventEmitter<FocusEvent>();
+
+  // tslint:disable-next-line: no-output-native
+  @Output() readonly blur = new EventEmitter<FocusEvent>();
+
+  @ViewChild('button', { static: true })
+  buttonRef: ElementRef<HTMLButtonElement>;
 
   get icon(): string {
-    return `${this.loading ? 'fa fa-spin fa-spinner' : this.iconClass || 'd-none'}`;
+    return `${this.loading ? 'fa fa-spinner fa-spin' : this.iconClass || 'd-none'}`;
+  }
+
+  constructor(private renderer: Renderer2) {}
+
+  ngOnInit() {
+    if (this.attributes) {
+      Object.keys(this.attributes).forEach(key => {
+        this.renderer.setAttribute(this.buttonRef.nativeElement, key, this.attributes[key]);
+      });
+    }
+  }
+
+  onClick(event: MouseEvent) {
+    event.stopPropagation();
+    this.click.next(event);
+  }
+
+  onFocus(event: FocusEvent) {
+    event.stopPropagation();
+    this.focus.next(event);
+  }
+
+  onBlur(event: FocusEvent) {
+    event.stopPropagation();
+    this.blur.next(event);
   }
 }

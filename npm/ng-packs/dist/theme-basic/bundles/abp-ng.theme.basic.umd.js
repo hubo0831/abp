@@ -1,11 +1,11 @@
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@abp/ng.core'), require('@angular/core'), require('@ng-bootstrap/ng-bootstrap'), require('@abp/ng.theme.shared'), require('@angular/forms'), require('@ngx-validate/core'), require('@ngxs/store'), require('snq'), require('rxjs/operators'), require('@ngxs/router-plugin'), require('angular-oauth2-oidc'), require('just-compare'), require('rxjs'), require('primeng/toast')) :
-    typeof define === 'function' && define.amd ? define('@abp/ng.theme.basic', ['exports', '@abp/ng.core', '@angular/core', '@ng-bootstrap/ng-bootstrap', '@abp/ng.theme.shared', '@angular/forms', '@ngx-validate/core', '@ngxs/store', 'snq', 'rxjs/operators', '@ngxs/router-plugin', 'angular-oauth2-oidc', 'just-compare', 'rxjs', 'primeng/toast'], factory) :
-    (global = global || self, factory((global.abp = global.abp || {}, global.abp.ng = global.abp.ng || {}, global.abp.ng.theme = global.abp.ng.theme || {}, global.abp.ng.theme.basic = {}), global.ng_core, global.ng.core, global.ngBootstrap, global.ng_theme_shared, global.ng.forms, global.core$1, global.store, global.snq, global.rxjs.operators, global.routerPlugin, global.angularOauth2Oidc, global.compare, global.rxjs, global.toast));
-}(this, function (exports, ng_core, core, ngBootstrap, ng_theme_shared, forms, core$1, store, snq, operators, routerPlugin, angularOauth2Oidc, compare, rxjs, toast) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports, require('@abp/ng.core'), require('@abp/ng.theme.shared'), require('@angular/core'), require('@ng-bootstrap/ng-bootstrap'), require('@ngx-validate/core'), require('@ngxs/store'), require('primeng/toast'), require('@ngxs/router-plugin'), require('angular-oauth2-oidc'), require('just-compare'), require('rxjs'), require('rxjs/operators'), require('snq')) :
+    typeof define === 'function' && define.amd ? define('@abp/ng.theme.basic', ['exports', '@abp/ng.core', '@abp/ng.theme.shared', '@angular/core', '@ng-bootstrap/ng-bootstrap', '@ngx-validate/core', '@ngxs/store', 'primeng/toast', '@ngxs/router-plugin', 'angular-oauth2-oidc', 'just-compare', 'rxjs', 'rxjs/operators', 'snq'], factory) :
+    (global = global || self, factory((global.abp = global.abp || {}, global.abp.ng = global.abp.ng || {}, global.abp.ng.theme = global.abp.ng.theme || {}, global.abp.ng.theme.basic = {}), global.ng_core, global.ng_theme_shared, global.ng.core, global.ngBootstrap, global.core$1, global.store, global.toast, global.routerPlugin, global.angularOauth2Oidc, global.compare, global.rxjs, global.rxjs.operators, global.snq));
+}(this, (function (exports, ng_core, ng_theme_shared, core, ngBootstrap, core$1, store, toast, routerPlugin, angularOauth2Oidc, compare, rxjs, operators, snq) { 'use strict';
 
-    snq = snq && snq.hasOwnProperty('default') ? snq['default'] : snq;
     compare = compare && compare.hasOwnProperty('default') ? compare['default'] : compare;
+    snq = snq && snq.hasOwnProperty('default') ? snq['default'] : snq;
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation. All rights reserved.
@@ -206,186 +206,18 @@
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
-     */
-    var minLength = forms.Validators.minLength, required = forms.Validators.required;
-    var ChangePasswordComponent = /** @class */ (function () {
-        function ChangePasswordComponent(fb, store, toasterService) {
-            this.fb = fb;
-            this.store = store;
-            this.toasterService = toasterService;
-            this.visibleChange = new core.EventEmitter();
-            this.modalBusy = false;
-        }
-        Object.defineProperty(ChangePasswordComponent.prototype, "visible", {
-            get: /**
-             * @return {?}
-             */
-            function () {
-                return this._visible;
-            },
-            set: /**
-             * @param {?} value
-             * @return {?}
-             */
-            function (value) {
-                this._visible = value;
-                this.visibleChange.emit(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
-        /**
-         * @return {?}
-         */
-        ChangePasswordComponent.prototype.ngOnInit = /**
-         * @return {?}
-         */
-        function () {
-            this.form = this.fb.group({
-                password: ['', required],
-                newPassword: ['', required],
-                repeatNewPassword: ['', required],
-            }, {
-                validators: [core$1.comparePasswords(['newPassword', 'repeatNewPassword'])],
-            });
-        };
-        /**
-         * @return {?}
-         */
-        ChangePasswordComponent.prototype.onSubmit = /**
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            if (this.form.invalid)
-                return;
-            this.modalBusy = true;
-            this.store
-                .dispatch(new ng_core.ChangePassword({
-                currentPassword: this.form.get('password').value,
-                newPassword: this.form.get('newPassword').value,
-            }))
-                .pipe(operators.finalize((/**
-             * @return {?}
-             */
-            function () {
-                _this.modalBusy = false;
-            })))
-                .subscribe({
-                next: (/**
-                 * @return {?}
-                 */
-                function () {
-                    _this.visible = false;
-                    _this.form.reset();
-                }),
-                error: (/**
-                 * @param {?} err
-                 * @return {?}
-                 */
-                function (err) {
-                    _this.toasterService.error(snq((/**
-                     * @return {?}
-                     */
-                    function () { return err.error.error.message; }), 'AbpAccount::DefaultErrorMessage'), 'Error', {
-                        life: 7000,
-                    });
-                }),
-            });
-        };
-        /**
-         * @return {?}
-         */
-        ChangePasswordComponent.prototype.openModal = /**
-         * @return {?}
-         */
-        function () {
-            this.visible = true;
-        };
-        /**
-         * @param {?} __0
-         * @return {?}
-         */
-        ChangePasswordComponent.prototype.ngOnChanges = /**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var visible = _a.visible;
-            if (!visible)
-                return;
-            if (visible.currentValue) {
-                this.openModal();
-            }
-            else if (visible.currentValue === false && this.visible) {
-                this.visible = false;
-            }
-        };
-        ChangePasswordComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'abp-change-password',
-                        template: "<abp-modal [(visible)]=\"visible\" [busy]=\"modalBusy\">\n  <ng-template #abpHeader>\n    <h4>{{ 'AbpIdentity::ChangePassword' | abpLocalization }}</h4>\n  </ng-template>\n  <ng-template #abpBody>\n    <form [formGroup]=\"form\" (ngSubmit)=\"onSubmit()\">\n      <div class=\"form-group\">\n        <label for=\"current-password\">{{ 'AbpIdentity::DisplayName:CurrentPassword' | abpLocalization }}</label\n        ><span> * </span\n        ><input type=\"password\" id=\"current-password\" class=\"form-control\" formControlName=\"password\" autofocus />\n      </div>\n      <div class=\"form-group\">\n        <label for=\"new-password\">{{ 'AbpIdentity::DisplayName:NewPassword' | abpLocalization }}</label\n        ><span> * </span><input type=\"password\" id=\"new-password\" class=\"form-control\" formControlName=\"newPassword\" />\n      </div>\n      <div class=\"form-group\" [class.is-invalid]=\"form.errors?.passwordMismatch\">\n        <label for=\"confirm-new-password\">{{ 'AbpIdentity::DisplayName:NewPasswordConfirm' | abpLocalization }}</label\n        ><span> * </span\n        ><input type=\"password\" id=\"confirm-new-password\" class=\"form-control\" formControlName=\"repeatNewPassword\" />\n        <div *ngIf=\"form.errors?.passwordMismatch\" class=\"invalid-feedback\">\n          {{ 'AbpIdentity::Identity.PasswordConfirmationFailed' | abpLocalization }}\n        </div>\n      </div>\n    </form>\n  </ng-template>\n  <ng-template #abpFooter>\n    <button type=\"button\" class=\"btn btn-secondary\" #abpClose>\n      {{ 'AbpIdentity::Cancel' | abpLocalization }}\n    </button>\n    <abp-button iconClass=\"fa fa-check\" (click)=\"onSubmit()\">{{ 'AbpIdentity::Save' | abpLocalization }}</abp-button>\n  </ng-template>\n</abp-modal>\n"
-                    }] }
-        ];
-        /** @nocollapse */
-        ChangePasswordComponent.ctorParameters = function () { return [
-            { type: forms.FormBuilder },
-            { type: store.Store },
-            { type: ng_theme_shared.ToasterService }
-        ]; };
-        ChangePasswordComponent.propDecorators = {
-            visible: [{ type: core.Input }],
-            visibleChange: [{ type: core.Output }],
-            modalContent: [{ type: core.ViewChild, args: ['modalContent', { static: false },] }]
-        };
-        return ChangePasswordComponent;
-    }());
-    if (false) {
-        /**
-         * @type {?}
-         * @protected
-         */
-        ChangePasswordComponent.prototype._visible;
-        /** @type {?} */
-        ChangePasswordComponent.prototype.visibleChange;
-        /** @type {?} */
-        ChangePasswordComponent.prototype.modalContent;
-        /** @type {?} */
-        ChangePasswordComponent.prototype.form;
-        /** @type {?} */
-        ChangePasswordComponent.prototype.modalBusy;
-        /**
-         * @type {?}
-         * @private
-         */
-        ChangePasswordComponent.prototype.fb;
-        /**
-         * @type {?}
-         * @private
-         */
-        ChangePasswordComponent.prototype.store;
-        /**
-         * @type {?}
-         * @private
-         */
-        ChangePasswordComponent.prototype.toasterService;
-    }
-
-    /**
-     * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/components/account-layout/account-layout.component.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AccountLayoutComponent = /** @class */ (function () {
         function AccountLayoutComponent() {
-            this.isCollapsed = false;
         }
         // required for dynamic component
         AccountLayoutComponent.type = "account" /* account */;
         AccountLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'abp-layout-account',
-                        template: "<abp-layout>\n  <ul class=\"navbar-nav mr-auto\">\n    <li class=\"nav-item\">\n      <a class=\"nav-link\" href=\"/\">\n        {{ '::Menu:Home' | abpLocalization }}\n      </a>\n    </li>\n  </ul>\n\n  <span id=\"main-navbar-tools\">\n    <span>\n      <div class=\"dropdown d-inline\" ngbDropdown>\n        <a class=\"btn btn-link dropdown-toggle\" role=\"button\" data-toggle=\"dropdown\" ngbDropdownToggle>\n          English\n        </a>\n\n        <div class=\"dropdown-menu\" ngbDropdownMenu>\n          <a class=\"dropdown-item\">\u010Ce\u0161tina</a>\n          <a class=\"dropdown-item\">Portugu\u00EAs</a>\n          <a class=\"dropdown-item\">T\u00FCrk\u00E7e</a>\n          <a class=\"dropdown-item\">\u7B80\u4F53\u4E2D\u6587</a>\n        </div>\n      </div>\n    </span>\n  </span>\n</abp-layout>\n"
+                        template: "\n    <router-outlet></router-outlet>\n    <abp-confirmation></abp-confirmation>\n    <abp-toast></abp-toast>\n  "
                     }] }
         ];
         return AccountLayoutComponent;
@@ -393,13 +225,12 @@
     if (false) {
         /** @type {?} */
         AccountLayoutComponent.type;
-        /** @type {?} */
-        AccountLayoutComponent.prototype.isCollapsed;
     }
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/actions/layout.actions.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var AddNavigationElement = /** @class */ (function () {
         function AddNavigationElement(payload) {
@@ -430,12 +261,14 @@
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/actions/index.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/states/layout.state.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var LayoutState = /** @class */ (function () {
         function LayoutState() {
@@ -561,19 +394,21 @@
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/states/index.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/components/application-layout/application-layout.component.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var ApplicationLayoutComponent = /** @class */ (function () {
-        function ApplicationLayoutComponent(store, oauthService) {
+        function ApplicationLayoutComponent(store, oauthService, renderer) {
             this.store = store;
             this.oauthService = oauthService;
-            this.isOpenChangePassword = false;
-            this.isOpenProfile = false;
+            this.renderer = renderer;
+            this.isCollapsed = true;
             this.rightPartElements = [];
             this.trackByFn = (/**
              * @param {?} _
@@ -588,6 +423,18 @@
              */
             function (_, element) { return element; });
         }
+        Object.defineProperty(ApplicationLayoutComponent.prototype, "appInfo", {
+            get: 
+            // do not set true or false
+            /**
+             * @return {?}
+             */
+            function () {
+                return this.store.selectSnapshot(ng_core.ConfigState.getApplicationInfo);
+            },
+            enumerable: true,
+            configurable: true
+        });
         Object.defineProperty(ApplicationLayoutComponent.prototype, "visibleRoutes$", {
             get: /**
              * @return {?}
@@ -670,18 +517,22 @@
              * @return {?}
              */
             function () {
-                _this.navbarRootDropdowns.forEach((/**
-                 * @param {?} item
-                 * @return {?}
-                 */
-                function (item) {
-                    item.close();
-                }));
                 if (window.innerWidth < 768) {
                     _this.isDropdownChildDynamic = false;
+                    if (_this.smallScreen === false) {
+                        _this.isCollapsed = false;
+                        setTimeout((/**
+                         * @return {?}
+                         */
+                        function () {
+                            _this.isCollapsed = true;
+                        }), 100);
+                    }
+                    _this.smallScreen = true;
                 }
                 else {
                     _this.isDropdownChildDynamic = true;
+                    _this.smallScreen = false;
                 }
             }), 0);
         };
@@ -737,7 +588,7 @@
             }));
             this.checkWindowWidth();
             rxjs.fromEvent(window, 'resize')
-                .pipe(ng_core.takeUntilDestroy(this), operators.debounceTime(250))
+                .pipe(ng_core.takeUntilDestroy(this), operators.debounceTime(150))
                 .subscribe((/**
              * @return {?}
              */
@@ -762,7 +613,6 @@
          */
         function (cultureName) {
             this.store.dispatch(new ng_core.SetLanguage(cultureName));
-            this.store.dispatch(new ng_core.GetAppConfiguration());
         };
         /**
          * @return {?}
@@ -777,23 +627,53 @@
             }));
             this.store.dispatch(new ng_core.GetAppConfiguration());
         };
+        /**
+         * @param {?} event
+         * @param {?} childrenContainer
+         * @return {?}
+         */
+        ApplicationLayoutComponent.prototype.openChange = /**
+         * @param {?} event
+         * @param {?} childrenContainer
+         * @return {?}
+         */
+        function (event, childrenContainer) {
+            var _this = this;
+            if (!event) {
+                Object.keys(childrenContainer.style)
+                    .filter((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) { return Number.isInteger(+key); }))
+                    .forEach((/**
+                 * @param {?} key
+                 * @return {?}
+                 */
+                function (key) {
+                    _this.renderer.removeStyle(childrenContainer, childrenContainer.style[key]);
+                }));
+                this.renderer.removeStyle(childrenContainer, 'left');
+            }
+        };
         // required for dynamic component
         ApplicationLayoutComponent.type = "application" /* application */;
         ApplicationLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'abp-layout-application',
-                        template: "<abp-layout>\n  <ul class=\"navbar-nav mr-auto\">\n    <ng-container\n      *ngFor=\"let route of visibleRoutes$ | async; trackBy: trackByFn\"\n      [ngTemplateOutlet]=\"route?.children?.length ? dropdownLink : defaultLink\"\n      [ngTemplateOutletContext]=\"{ $implicit: route }\"\n    >\n    </ng-container>\n\n    <ng-template #defaultLink let-route>\n      <li class=\"nav-item\" [abpPermission]=\"route.requiredPolicy\">\n        <a class=\"nav-link\" [routerLink]=\"[route.url]\">{{ route.name | abpLocalization }}</a>\n      </li>\n    </ng-template>\n\n    <ng-template #dropdownLink let-route>\n      <li\n        #navbarRootDropdown\n        ngbDropdown\n        [abpPermission]=\"route.requiredPolicy\"\n        [abpVisibility]=\"routeContainer\"\n        class=\"nav-item dropdown pointer\"\n        display=\"static\"\n      >\n        <a ngbDropdownToggle class=\"nav-link dropdown-toggle pointer\" data-toggle=\"dropdown\">\n          {{ route.name | abpLocalization }}\n        </a>\n        <div #routeContainer ngbDropdownMenu class=\"dropdown-menu dropdown-menu-right\">\n          <ng-template\n            #forTemplate\n            ngFor\n            [ngForOf]=\"route.children\"\n            [ngForTrackBy]=\"trackByFn\"\n            [ngForTemplate]=\"childWrapper\"\n          ></ng-template>\n        </div>\n      </li>\n    </ng-template>\n\n    <ng-template #childWrapper let-child>\n      <ng-template\n        [ngTemplateOutlet]=\"child?.children?.length ? dropdownChild : defaultChild\"\n        [ngTemplateOutletContext]=\"{ $implicit: child }\"\n      ></ng-template>\n    </ng-template>\n\n    <ng-template #defaultChild let-child>\n      <div class=\"dropdown-submenu\" [abpPermission]=\"child.requiredPolicy\">\n        <a class=\"dropdown-item py-2 px-2\" [routerLink]=\"[child.url]\">\n          <i *ngIf=\"child.iconClass\" [ngClass]=\"child.iconClass\"></i>\n          {{ child.name | abpLocalization }}</a\n        >\n      </div>\n    </ng-template>\n\n    <ng-template #dropdownChild let-child>\n      <div\n        [abpVisibility]=\"childrenContainer\"\n        class=\"dropdown-submenu pointer\"\n        ngbDropdown\n        [display]=\"isDropdownChildDynamic ? 'dynamic' : 'static'\"\n        placement=\"right-top\"\n        [abpPermission]=\"child.requiredPolicy\"\n      >\n        <div ngbDropdownToggle [class.dropdown-toggle]=\"false\" class=\"pointer\">\n          <a\n            abpEllipsis=\"210px\"\n            [abpEllipsisEnabled]=\"isDropdownChildDynamic\"\n            role=\"button\"\n            class=\"btn d-block text-left py-2 px-2 dropdown-toggle\"\n          >\n            <i *ngIf=\"child.iconClass\" [ngClass]=\"child.iconClass\"></i>\n            {{ child.name | abpLocalization }}\n          </a>\n        </div>\n        <div #childrenContainer ngbDropdownMenu class=\"dropdown-menu dropdown-menu-right\">\n          <ng-template\n            ngFor\n            [ngForOf]=\"child.children\"\n            [ngForTrackBy]=\"trackByFn\"\n            [ngForTemplate]=\"childWrapper\"\n          ></ng-template>\n        </div>\n      </div>\n    </ng-template>\n  </ul>\n\n  <ul class=\"navbar-nav ml-auto\">\n    <ng-container\n      *ngFor=\"let element of rightPartElements; trackBy: trackElementByFn\"\n      [ngTemplateOutlet]=\"element\"\n    ></ng-container>\n  </ul>\n</abp-layout>\n\n<ng-template #language>\n  <li class=\"nav-item dropdown pointer\" ngbDropdown>\n    <a ngbDropdownToggle class=\"nav-link dropdown-toggle text-white pointer\" data-toggle=\"dropdown\">\n      {{ defaultLanguage$ | async }}\n    </a>\n    <div ngbDropdownMenu class=\"dropdown-menu dropdown-menu-right\">\n      <a\n        *ngFor=\"let lang of dropdownLanguages$ | async\"\n        class=\"dropdown-item\"\n        (click)=\"onChangeLang(lang.cultureName)\"\n        >{{ lang?.displayName }}</a\n      >\n    </div>\n  </li>\n</ng-template>\n\n<ng-template #currentUser>\n  <li *ngIf=\"(currentUser$ | async)?.isAuthenticated\" class=\"nav-item dropdown pointer\" ngbDropdown>\n    <a ngbDropdownToggle class=\"nav-link dropdown-toggle text-white pointer\" data-toggle=\"dropdown\">\n      {{ (currentUser$ | async)?.userName }}\n    </a>\n    <div ngbDropdownMenu class=\"dropdown-menu dropdown-menu-right\">\n      <a class=\"dropdown-item pointer\" (click)=\"isOpenChangePassword = true\">{{\n        'AbpUi::ChangePassword' | abpLocalization\n      }}</a>\n      <a class=\"dropdown-item pointer\" (click)=\"isOpenProfile = true\">{{ 'AbpUi::PersonalInfo' | abpLocalization }}</a>\n      <a class=\"dropdown-item pointer\" (click)=\"logout()\">{{ 'AbpUi::Logout' | abpLocalization }}</a>\n    </div>\n  </li>\n\n  <abp-change-password [(visible)]=\"isOpenChangePassword\"></abp-change-password>\n\n  <abp-profile [(visible)]=\"isOpenProfile\"></abp-profile>\n</ng-template>\n"
+                        template: "<nav\r\n  class=\"navbar navbar-expand-md navbar-dark bg-dark shadow-sm flex-column flex-md-row mb-4\"\r\n  id=\"main-navbar\"\r\n  style=\"min-height: 4rem;\"\r\n>\r\n  <div class=\"container \">\r\n    <a class=\"navbar-brand\" routerLink=\"/\">\r\n      <img *ngIf=\"appInfo.logoUrl; else appName\" [src]=\"appInfo.logoUrl\" [alt]=\"appInfo.name\" />\r\n    </a>\r\n    <button\r\n      class=\"navbar-toggler\"\r\n      type=\"button\"\r\n      [attr.aria-expanded]=\"!isCollapsed\"\r\n      (click)=\"isCollapsed = !isCollapsed\"\r\n    >\r\n      <span class=\"navbar-toggler-icon\"></span>\r\n    </button>\r\n    <div class=\"navbar-collapse\" [class.overflow-hidden]=\"smallScreen\" id=\"main-navbar-collapse\">\r\n      <ng-container *ngTemplateOutlet=\"!smallScreen ? navigations : null\"></ng-container>\r\n\r\n      <div *ngIf=\"smallScreen\" [@collapseWithMargin]=\"isCollapsed ? 'collapsed' : 'expanded'\">\r\n        <ng-container *ngTemplateOutlet=\"navigations\"></ng-container>\r\n      </div>\r\n\r\n      <ng-template #navigations>\r\n        <ul class=\"navbar-nav mx-auto\">\r\n          <ng-container\r\n            *ngFor=\"let route of visibleRoutes$ | async; trackBy: trackByFn\"\r\n            [ngTemplateOutlet]=\"route?.children?.length ? dropdownLink : defaultLink\"\r\n            [ngTemplateOutletContext]=\"{ $implicit: route }\"\r\n          >\r\n          </ng-container>\r\n\r\n          <ng-template #defaultLink let-route>\r\n            <li class=\"nav-item\" [abpPermission]=\"route.requiredPolicy\">\r\n              <a class=\"nav-link\" [routerLink]=\"[route.url]\"\r\n                ><i *ngIf=\"route.iconClass\" [ngClass]=\"route.iconClass\"></i> {{ route.name | abpLocalization }}</a\r\n              >\r\n            </li>\r\n          </ng-template>\r\n\r\n          <ng-template #dropdownLink let-route>\r\n            <li\r\n              #navbarRootDropdown\r\n              [abpPermission]=\"route.requiredPolicy\"\r\n              [abpVisibility]=\"routeContainer\"\r\n              class=\"nav-item dropdown\"\r\n              display=\"static\"\r\n              (click)=\"\r\n                navbarRootDropdown.expand ? (navbarRootDropdown.expand = false) : (navbarRootDropdown.expand = true)\r\n              \"\r\n            >\r\n              <a\r\n                class=\"nav-link dropdown-toggle\"\r\n                data-toggle=\"dropdown\"\r\n                aria-haspopup=\"true\"\r\n                aria-expanded=\"false\"\r\n                href=\"javascript:void(0)\"\r\n              >\r\n                <i *ngIf=\"route.iconClass\" [ngClass]=\"route.iconClass\"></i> {{ route.name | abpLocalization }}\r\n              </a>\r\n              <div\r\n                #routeContainer\r\n                class=\"dropdown-menu border-0 shadow-sm\"\r\n                (click)=\"$event.preventDefault(); $event.stopPropagation()\"\r\n                [class.abp-collapsed-height]=\"smallScreen\"\r\n                [class.d-block]=\"smallScreen\"\r\n                [class.abp-mh-25]=\"smallScreen && navbarRootDropdown.expand\"\r\n              >\r\n                <ng-template\r\n                  #forTemplate\r\n                  ngFor\r\n                  [ngForOf]=\"route.children\"\r\n                  [ngForTrackBy]=\"trackByFn\"\r\n                  [ngForTemplate]=\"childWrapper\"\r\n                ></ng-template>\r\n              </div>\r\n            </li>\r\n          </ng-template>\r\n\r\n          <ng-template #childWrapper let-child>\r\n            <ng-template\r\n              [ngTemplateOutlet]=\"child?.children?.length ? dropdownChild : defaultChild\"\r\n              [ngTemplateOutletContext]=\"{ $implicit: child }\"\r\n            ></ng-template>\r\n          </ng-template>\r\n\r\n          <ng-template #defaultChild let-child>\r\n            <div class=\"dropdown-submenu\" [abpPermission]=\"child.requiredPolicy\">\r\n              <a class=\"dropdown-item\" [routerLink]=\"[child.url]\">\r\n                <i *ngIf=\"child.iconClass\" [ngClass]=\"child.iconClass\"></i>\r\n                {{ child.name | abpLocalization }}</a\r\n              >\r\n            </div>\r\n          </ng-template>\r\n\r\n          <ng-template #dropdownChild let-child>\r\n            <div\r\n              [abpVisibility]=\"childrenContainer\"\r\n              class=\"dropdown-submenu\"\r\n              ngbDropdown\r\n              #dropdownSubmenu=\"ngbDropdown\"\r\n              [display]=\"isDropdownChildDynamic ? 'dynamic' : 'static'\"\r\n              placement=\"right-top\"\r\n              [autoClose]=\"true\"\r\n              [abpPermission]=\"child.requiredPolicy\"\r\n              (openChange)=\"openChange($event, childrenContainer)\"\r\n            >\r\n              <div ngbDropdownToggle [class.dropdown-toggle]=\"false\">\r\n                <a\r\n                  abpEllipsis=\"210px\"\r\n                  [abpEllipsisEnabled]=\"isDropdownChildDynamic\"\r\n                  role=\"button\"\r\n                  class=\"btn d-block text-left dropdown-toggle\"\r\n                >\r\n                  <i *ngIf=\"child.iconClass\" [ngClass]=\"child.iconClass\"></i>\r\n                  {{ child.name | abpLocalization }}\r\n                </a>\r\n              </div>\r\n              <div\r\n                #childrenContainer\r\n                class=\"dropdown-menu border-0 shadow-sm\"\r\n                [class.abp-collapsed-height]=\"smallScreen\"\r\n                [class.d-block]=\"smallScreen\"\r\n                [class.abp-mh-25]=\"smallScreen && dropdownSubmenu.isOpen()\"\r\n              >\r\n                <ng-template\r\n                  ngFor\r\n                  [ngForOf]=\"child.children\"\r\n                  [ngForTrackBy]=\"trackByFn\"\r\n                  [ngForTemplate]=\"childWrapper\"\r\n                ></ng-template>\r\n              </div>\r\n            </div>\r\n          </ng-template>\r\n        </ul>\r\n\r\n        <ul class=\"navbar-nav\">\r\n          <ng-container\r\n            *ngFor=\"let element of rightPartElements; trackBy: trackElementByFn\"\r\n            [ngTemplateOutlet]=\"element\"\r\n          ></ng-container>\r\n        </ul>\r\n      </ng-template>\r\n    </div>\r\n  </div>\r\n</nav>\r\n\r\n<div [@slideFromBottom]=\"outlet && outlet.activatedRoute && outlet.activatedRoute.routeConfig.path\" class=\"container\">\r\n  <router-outlet #outlet=\"outlet\"></router-outlet>\r\n</div>\r\n\r\n<abp-confirmation></abp-confirmation>\r\n<abp-toast></abp-toast>\r\n\r\n<ng-template #appName>\r\n  {{ appInfo.name }}\r\n</ng-template>\r\n\r\n<ng-template #language>\r\n  <li class=\"nav-item\">\r\n    <div class=\"dropdown\" ngbDropdown #languageDropdown=\"ngbDropdown\" display=\"static\">\r\n      <a\r\n        ngbDropdownToggle\r\n        class=\"nav-link\"\r\n        href=\"javascript:void(0)\"\r\n        role=\"button\"\r\n        id=\"dropdownMenuLink\"\r\n        data-toggle=\"dropdown\"\r\n        aria-haspopup=\"true\"\r\n        aria-expanded=\"false\"\r\n      >\r\n        {{ defaultLanguage$ | async }}\r\n      </a>\r\n      <div\r\n        class=\"dropdown-menu dropdown-menu-right border-0 shadow-sm\"\r\n        aria-labelledby=\"dropdownMenuLink\"\r\n        [class.abp-collapsed-height]=\"smallScreen\"\r\n        [class.d-block]=\"smallScreen\"\r\n        [class.abp-mh-25]=\"smallScreen && languageDropdown.isOpen()\"\r\n      >\r\n        <a\r\n          *ngFor=\"let lang of dropdownLanguages$ | async\"\r\n          href=\"javascript:void(0)\"\r\n          class=\"dropdown-item\"\r\n          (click)=\"onChangeLang(lang.cultureName)\"\r\n          >{{ lang?.displayName }}</a\r\n        >\r\n      </div>\r\n    </div>\r\n  </li>\r\n</ng-template>\r\n\r\n<ng-template #currentUser>\r\n  <li *ngIf=\"(currentUser$ | async)?.isAuthenticated\" class=\"nav-item\">\r\n    <div ngbDropdown class=\"dropdown\" #currentUserDropdown=\"ngbDropdown\" display=\"static\">\r\n      <a\r\n        ngbDropdownToggle\r\n        class=\"nav-link\"\r\n        href=\"javascript:void(0)\"\r\n        role=\"button\"\r\n        id=\"dropdownMenuLink\"\r\n        data-toggle=\"dropdown\"\r\n        aria-haspopup=\"true\"\r\n        aria-expanded=\"false\"\r\n      >\r\n        {{ (currentUser$ | async)?.userName }}\r\n      </a>\r\n      <div\r\n        class=\"dropdown-menu dropdown-menu-right border-0 shadow-sm\"\r\n        aria-labelledby=\"dropdownMenuLink\"\r\n        [class.abp-collapsed-height]=\"smallScreen\"\r\n        [class.d-block]=\"smallScreen\"\r\n        [class.abp-mh-25]=\"smallScreen && currentUserDropdown.isOpen()\"\r\n      >\r\n        <a class=\"dropdown-item\" routerLink=\"/account/manage-profile\">{{\r\n          'AbpAccount::ManageYourProfile' | abpLocalization\r\n        }}</a>\r\n        <a class=\"dropdown-item\" href=\"javascript:void(0)\" (click)=\"logout()\">{{\r\n          'AbpUi::Logout' | abpLocalization\r\n        }}</a>\r\n      </div>\r\n    </div>\r\n  </li>\r\n</ng-template>\r\n",
+                        animations: [ng_theme_shared.slideFromBottom, ng_theme_shared.collapseWithMargin]
                     }] }
         ];
         /** @nocollapse */
         ApplicationLayoutComponent.ctorParameters = function () { return [
             { type: store.Store },
-            { type: angularOauth2Oidc.OAuthService }
+            { type: angularOauth2Oidc.OAuthService },
+            { type: core.Renderer2 }
         ]; };
         ApplicationLayoutComponent.propDecorators = {
             currentUserRef: [{ type: core.ViewChild, args: ['currentUser', { static: false, read: core.TemplateRef },] }],
-            languageRef: [{ type: core.ViewChild, args: ['language', { static: false, read: core.TemplateRef },] }],
-            navbarRootDropdowns: [{ type: core.ViewChildren, args: ['navbarRootDropdown', { read: ngBootstrap.NgbDropdown },] }]
+            languageRef: [{ type: core.ViewChild, args: ['language', { static: false, read: core.TemplateRef },] }]
         };
         __decorate([
             store.Select(ng_core.ConfigState.getOne('routes')),
@@ -829,13 +709,11 @@
         /** @type {?} */
         ApplicationLayoutComponent.prototype.languageRef;
         /** @type {?} */
-        ApplicationLayoutComponent.prototype.navbarRootDropdowns;
-        /** @type {?} */
-        ApplicationLayoutComponent.prototype.isOpenChangePassword;
-        /** @type {?} */
-        ApplicationLayoutComponent.prototype.isOpenProfile;
-        /** @type {?} */
         ApplicationLayoutComponent.prototype.isDropdownChildDynamic;
+        /** @type {?} */
+        ApplicationLayoutComponent.prototype.isCollapsed;
+        /** @type {?} */
+        ApplicationLayoutComponent.prototype.smallScreen;
         /** @type {?} */
         ApplicationLayoutComponent.prototype.rightPartElements;
         /** @type {?} */
@@ -852,6 +730,11 @@
          * @private
          */
         ApplicationLayoutComponent.prototype.oauthService;
+        /**
+         * @type {?}
+         * @private
+         */
+        ApplicationLayoutComponent.prototype.renderer;
     }
     /**
      * @param {?} routes
@@ -875,17 +758,17 @@
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/components/empty-layout/empty-layout.component.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var EmptyLayoutComponent = /** @class */ (function () {
         function EmptyLayoutComponent() {
         }
-        // required for dynamic component
         EmptyLayoutComponent.type = "empty" /* empty */;
         EmptyLayoutComponent.decorators = [
             { type: core.Component, args: [{
                         selector: 'abp-layout-empty',
-                        template: "\n    Layout-empty\n    <router-outlet></router-outlet>\n  "
+                        template: "\n    <router-outlet></router-outlet>\n    <abp-confirmation></abp-confirmation>\n    <abp-toast></abp-toast>\n  "
                     }] }
         ];
         return EmptyLayoutComponent;
@@ -897,210 +780,108 @@
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/components/validation-error/validation-error.component.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var LayoutComponent = /** @class */ (function () {
-        function LayoutComponent(store) {
-            this.store = store;
-            this.isCollapsed = true;
+    var ValidationErrorComponent = /** @class */ (function (_super) {
+        __extends(ValidationErrorComponent, _super);
+        function ValidationErrorComponent() {
+            return _super !== null && _super.apply(this, arguments) || this;
         }
-        Object.defineProperty(LayoutComponent.prototype, "appInfo", {
+        Object.defineProperty(ValidationErrorComponent.prototype, "abpErrors", {
             get: /**
              * @return {?}
              */
             function () {
-                return this.store.selectSnapshot(ng_core.ConfigState.getApplicationInfo);
+                if (!this.errors || !this.errors.length)
+                    return [];
+                return this.errors.map((/**
+                 * @param {?} error
+                 * @return {?}
+                 */
+                function (error) {
+                    if (!error.message)
+                        return error;
+                    /** @type {?} */
+                    var index = error.message.indexOf('[');
+                    if (index > -1) {
+                        return __assign({}, error, { message: error.message.slice(0, index), interpoliteParams: error.message.slice(index + 1, error.message.length - 1).split(',') });
+                    }
+                    return error;
+                }));
             },
             enumerable: true,
             configurable: true
         });
-        LayoutComponent.decorators = [
+        ValidationErrorComponent.decorators = [
             { type: core.Component, args: [{
-                        selector: ' abp-layout',
-                        template: "<nav class=\"navbar navbar-expand-md navbar-dark bg-dark fixed-top\" id=\"main-navbar\">\n  <a class=\"navbar-brand\" routerLink=\"/\">\n    <img *ngIf=\"appInfo.logoUrl; else appName\" [src]=\"appInfo.logoUrl\" [alt]=\"appInfo.name\" />\n  </a>\n  <button class=\"navbar-toggler\" type=\"button\" [attr.aria-expanded]=\"!isCollapsed\" (click)=\"isCollapsed = !isCollapsed\">\n    <span class=\"navbar-toggler-icon\"></span>\n  </button>\n  <div class=\"collapse navbar-collapse\" id=\"main-navbar-collapse\" [ngbCollapse]=\"isCollapsed\">\n    <ng-content></ng-content>\n  </div>\n</nav>\n\n<div\n  [@routeAnimations]=\"outlet && outlet.activatedRoute && outlet.activatedRoute.routeConfig.path\"\n  style=\"padding-top: 5rem;\"\n  class=\"container\"\n>\n  <router-outlet #outlet=\"outlet\"></router-outlet>\n</div>\n\n<abp-confirmation></abp-confirmation>\n<abp-toast></abp-toast>\n\n<ng-template #appName>\n  {{ appInfo.name }}\n</ng-template>\n",
-                        animations: [ng_theme_shared.slideFromBottom]
+                        selector: 'abp-validation-error',
+                        template: "\n    <div class=\"invalid-feedback\" *ngFor=\"let error of abpErrors; trackBy: trackByFn\">\n      {{ error.message | abpLocalization: error.interpoliteParams }}\n    </div>\n  ",
+                        changeDetection: core.ChangeDetectionStrategy.OnPush,
+                        encapsulation: core.ViewEncapsulation.None
                     }] }
         ];
-        /** @nocollapse */
-        LayoutComponent.ctorParameters = function () { return [
-            { type: store.Store }
-        ]; };
-        return LayoutComponent;
-    }());
-    if (false) {
-        /** @type {?} */
-        LayoutComponent.prototype.isCollapsed;
-        /**
-         * @type {?}
-         * @private
-         */
-        LayoutComponent.prototype.store;
-    }
+        return ValidationErrorComponent;
+    }(core$1.ValidationErrorComponent));
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/constants/styles.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
-    var maxLength = forms.Validators.maxLength, required$1 = forms.Validators.required, email = forms.Validators.email;
-    var ProfileComponent = /** @class */ (function () {
-        function ProfileComponent(fb, store) {
-            this.fb = fb;
-            this.store = store;
-            this.visibleChange = new core.EventEmitter();
-            this.modalBusy = false;
+    var styles = "\n.content-header-title {\n    font-size: 24px;\n}\n\n.entry-row {\n    margin-bottom: 15px;\n}\n\n#main-navbar-tools a.dropdown-toggle {\n    text-decoration: none;\n    color: #fff;\n}\n\n.navbar .dropdown-submenu {\n    position: relative;\n}\n.navbar .dropdown-menu {\n    margin: 0;\n    padding: 0;\n}\n    .navbar .dropdown-menu a {\n        font-size: .9em;\n        padding: 10px 15px;\n        display: block;\n        min-width: 210px;\n        text-align: left;\n        border-radius: 0.25rem;\n        min-height: 44px;\n    }\n.navbar .dropdown-submenu a::after {\n    transform: rotate(-90deg);\n    position: absolute;\n    right: 16px;\n    top: 18px;\n}\n.navbar .dropdown-submenu .dropdown-menu {\n    top: 0;\n    left: 100%;\n}\n\n.card-header .btn {\n    padding: 2px 6px;\n}\n.card-header h5 {\n    margin: 0;\n}\n.container > .card {\n    box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075) !important;\n}\n\n@media screen and (min-width: 768px) {\n    .navbar .dropdown:hover > .dropdown-menu {\n        display: block;\n    }\n\n    .navbar .dropdown-submenu:hover > .dropdown-menu {\n        display: block;\n    }\n}\n.input-validation-error {\n    border-color: #dc3545;\n}\n.field-validation-error {\n    font-size: 0.8em;\n}\n";
+
+    /**
+     * @fileoverview added by tsickle
+     * Generated from: lib/services/initial.service.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     */
+    var InitialService = /** @class */ (function () {
+        function InitialService(lazyLoadService) {
+            this.lazyLoadService = lazyLoadService;
+            this.appendStyle().subscribe();
         }
-        Object.defineProperty(ProfileComponent.prototype, "visible", {
-            get: /**
-             * @return {?}
-             */
-            function () {
-                return this._visible;
-            },
-            set: /**
-             * @param {?} value
-             * @return {?}
-             */
-            function (value) {
-                this._visible = value;
-                this.visibleChange.emit(value);
-            },
-            enumerable: true,
-            configurable: true
-        });
         /**
          * @return {?}
          */
-        ProfileComponent.prototype.buildForm = /**
+        InitialService.prototype.appendStyle = /**
          * @return {?}
          */
         function () {
-            var _this = this;
-            this.store
-                .dispatch(new ng_core.GetProfile())
-                .pipe(operators.withLatestFrom(this.profile$), operators.take(1))
-                .subscribe((/**
-             * @param {?} __0
-             * @return {?}
-             */
-            function (_a) {
-                var _b = __read(_a, 2), profile = _b[1];
-                _this.form = _this.fb.group({
-                    userName: [profile.userName, [required$1, maxLength(256)]],
-                    email: [profile.email, [required$1, email, maxLength(256)]],
-                    name: [profile.name || '', [maxLength(64)]],
-                    surname: [profile.surname || '', [maxLength(64)]],
-                    phoneNumber: [profile.phoneNumber || '', [maxLength(16)]],
-                });
-            }));
+            return this.lazyLoadService.load(null, 'style', styles, 'head', 'afterbegin');
         };
-        /**
-         * @return {?}
-         */
-        ProfileComponent.prototype.onSubmit = /**
-         * @return {?}
-         */
-        function () {
-            var _this = this;
-            if (this.form.invalid)
-                return;
-            this.modalBusy = true;
-            this.store.dispatch(new ng_core.UpdateProfile(this.form.value)).subscribe((/**
-             * @return {?}
-             */
-            function () {
-                _this.modalBusy = false;
-                _this.visible = false;
-                _this.form.reset();
-            }));
-        };
-        /**
-         * @return {?}
-         */
-        ProfileComponent.prototype.openModal = /**
-         * @return {?}
-         */
-        function () {
-            this.buildForm();
-            this.visible = true;
-        };
-        /**
-         * @param {?} __0
-         * @return {?}
-         */
-        ProfileComponent.prototype.ngOnChanges = /**
-         * @param {?} __0
-         * @return {?}
-         */
-        function (_a) {
-            var visible = _a.visible;
-            if (!visible)
-                return;
-            if (visible.currentValue) {
-                this.openModal();
-            }
-            else if (visible.currentValue === false && this.visible) {
-                this.visible = false;
-            }
-        };
-        ProfileComponent.decorators = [
-            { type: core.Component, args: [{
-                        selector: 'abp-profile',
-                        template: "<abp-modal [(visible)]=\"visible\" [busy]=\"modalBusy\">\n  <ng-template #abpHeader>\n    <h4>{{ 'AbpIdentity::PersonalInfo' | abpLocalization }}</h4>\n  </ng-template>\n  <ng-template #abpBody>\n    <form novalidate *ngIf=\"form\" [formGroup]=\"form\" (ngSubmit)=\"onSubmit()\">\n      <div class=\"form-group\">\n        <label for=\"username\">{{ 'AbpIdentity::DisplayName:UserName' | abpLocalization }}</label\n        ><span> * </span><input type=\"text\" id=\"username\" class=\"form-control\" formControlName=\"userName\" autofocus />\n      </div>\n      <div class=\"row\">\n        <div class=\"col col-md-6\">\n          <div class=\"form-group\">\n            <label for=\"name\">{{ 'AbpIdentity::DisplayName:Name' | abpLocalization }}</label\n            ><input type=\"text\" id=\"name\" class=\"form-control\" formControlName=\"name\" />\n          </div>\n        </div>\n        <div class=\"col col-md-6\">\n          <div class=\"form-group\">\n            <label for=\"surname\">{{ 'AbpIdentity::DisplayName:Surname' | abpLocalization }}</label\n            ><input type=\"text\" id=\"surname\" class=\"form-control\" formControlName=\"surname\" />\n          </div>\n        </div>\n      </div>\n      <div class=\"form-group\">\n        <label for=\"email-address\">{{ 'AbpIdentity::DisplayName:Email' | abpLocalization }}</label\n        ><span> * </span><input type=\"text\" id=\"email-address\" class=\"form-control\" formControlName=\"email\" />\n      </div>\n      <div class=\"form-group\">\n        <label for=\"phone-number\">{{ 'AbpIdentity::DisplayName:PhoneNumber' | abpLocalization }}</label\n        ><input type=\"text\" id=\"phone-number\" class=\"form-control\" formControlName=\"phoneNumber\" />\n      </div>\n    </form>\n  </ng-template>\n  <ng-template #abpFooter>\n    <button #abpClose type=\"button\" class=\"btn btn-secondary\">\n      {{ 'AbpIdentity::Cancel' | abpLocalization }}\n    </button>\n    <abp-button iconClass=\"fa fa-check\" (click)=\"onSubmit()\">{{ 'AbpIdentity::Save' | abpLocalization }}</abp-button>\n  </ng-template>\n</abp-modal>\n"
-                    }] }
+        InitialService.decorators = [
+            { type: core.Injectable, args: [{ providedIn: 'root' },] }
         ];
         /** @nocollapse */
-        ProfileComponent.ctorParameters = function () { return [
-            { type: forms.FormBuilder },
-            { type: store.Store }
+        InitialService.ctorParameters = function () { return [
+            { type: ng_core.LazyLoadService }
         ]; };
-        ProfileComponent.propDecorators = {
-            visible: [{ type: core.Input }],
-            visibleChange: [{ type: core.Output }]
-        };
-        __decorate([
-            store.Select(ng_core.ProfileState.getProfile),
-            __metadata("design:type", rxjs.Observable)
-        ], ProfileComponent.prototype, "profile$", void 0);
-        return ProfileComponent;
+        /** @nocollapse */ InitialService.ngInjectableDef = core.ɵɵdefineInjectable({ factory: function InitialService_Factory() { return new InitialService(core.ɵɵinject(ng_core.LazyLoadService)); }, token: InitialService, providedIn: "root" });
+        return InitialService;
     }());
     if (false) {
         /**
          * @type {?}
-         * @protected
-         */
-        ProfileComponent.prototype._visible;
-        /** @type {?} */
-        ProfileComponent.prototype.visibleChange;
-        /** @type {?} */
-        ProfileComponent.prototype.profile$;
-        /** @type {?} */
-        ProfileComponent.prototype.form;
-        /** @type {?} */
-        ProfileComponent.prototype.modalBusy;
-        /**
-         * @type {?}
          * @private
          */
-        ProfileComponent.prototype.fb;
-        /**
-         * @type {?}
-         * @private
-         */
-        ProfileComponent.prototype.store;
+        InitialService.prototype.lazyLoadService;
     }
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/theme-basic.module.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     /** @type {?} */
     var LAYOUTS = [ApplicationLayoutComponent, AccountLayoutComponent, EmptyLayoutComponent];
     var ThemeBasicModule = /** @class */ (function () {
-        function ThemeBasicModule() {
+        function ThemeBasicModule(initialService) {
+            this.initialService = initialService;
         }
         ThemeBasicModule.decorators = [
             { type: core.NgModule, args: [{
-                        declarations: __spread(LAYOUTS, [LayoutComponent, ChangePasswordComponent, ProfileComponent]),
+                        declarations: __spread(LAYOUTS, [ValidationErrorComponent]),
                         imports: [
                             ng_core.CoreModule,
                             ng_theme_shared.ThemeSharedModule,
@@ -1109,22 +890,48 @@
                             toast.ToastModule,
                             core$1.NgxValidateCoreModule,
                             store.NgxsModule.forFeature([LayoutState]),
+                            core$1.NgxValidateCoreModule.forRoot({
+                                targetSelector: '.form-group',
+                                blueprints: {
+                                    email: 'AbpAccount::ThisFieldIsNotAValidEmailAddress.',
+                                    max: 'AbpAccount::ThisFieldMustBeBetween{0}And{1}[{{ min }},{{ max }}]',
+                                    maxlength: 'AbpAccount::ThisFieldMustBeAStringOrArrayTypeWithAMaximumLengthoOf{0}[{{ requiredLength }}]',
+                                    min: 'AbpAccount::ThisFieldMustBeBetween{0}And{1}[{{ min }},{{ max }}]',
+                                    minlength: 'AbpAccount::ThisFieldMustBeAStringOrArrayTypeWithAMinimumLengthOf{0}[{{ requiredLength }}]',
+                                    required: 'AbpAccount::ThisFieldIsRequired.',
+                                    passwordMismatch: 'AbpIdentity::Identity.PasswordConfirmationFailed',
+                                },
+                                errorTemplate: ValidationErrorComponent,
+                            }),
                         ],
                         exports: __spread(LAYOUTS),
-                        entryComponents: __spread(LAYOUTS),
+                        entryComponents: __spread(LAYOUTS, [ValidationErrorComponent]),
                     },] }
         ];
+        /** @nocollapse */
+        ThemeBasicModule.ctorParameters = function () { return [
+            { type: InitialService }
+        ]; };
         return ThemeBasicModule;
     }());
+    if (false) {
+        /**
+         * @type {?}
+         * @private
+         */
+        ThemeBasicModule.prototype.initialService;
+    }
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/components/index.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
 
     /**
      * @fileoverview added by tsickle
-     * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+     * Generated from: lib/models/layout.ts
+     * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
      */
     var Layout;
     (function (Layout) {
@@ -1160,18 +967,18 @@
     exports.LayoutState = LayoutState;
     exports.RemoveNavigationElementByName = RemoveNavigationElementByName;
     exports.ThemeBasicModule = ThemeBasicModule;
+    exports.ValidationErrorComponent = ValidationErrorComponent;
     exports.ɵa = ApplicationLayoutComponent;
     exports.ɵb = LayoutState;
     exports.ɵc = AccountLayoutComponent;
     exports.ɵd = EmptyLayoutComponent;
-    exports.ɵe = LayoutComponent;
-    exports.ɵf = ChangePasswordComponent;
-    exports.ɵg = ProfileComponent;
-    exports.ɵh = LayoutState;
-    exports.ɵi = AddNavigationElement;
-    exports.ɵj = RemoveNavigationElementByName;
+    exports.ɵe = ValidationErrorComponent;
+    exports.ɵf = LayoutState;
+    exports.ɵg = AddNavigationElement;
+    exports.ɵh = RemoveNavigationElementByName;
+    exports.ɵj = InitialService;
 
     Object.defineProperty(exports, '__esModule', { value: true });
 
-}));
+})));
 //# sourceMappingURL=abp-ng.theme.basic.umd.js.map

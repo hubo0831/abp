@@ -1,15 +1,22 @@
 /**
  * @fileoverview added by tsickle
- * @suppress {checkTypes,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
+ * Generated from: lib/constants/routes.ts
+ * @suppress {checkTypes,constantProperty,extraRequire,missingOverride,missingReturn,unusedPrivateMembers,uselessCode} checked by tsc
  */
-/** @type {?} */
-export var ACCOUNT_ROUTES = (/** @type {?} */ ([
-    {
-        name: 'Account',
-        path: 'account',
-        invisible: true,
-        layout: "application" /* application */,
-        children: [{ path: 'login', name: 'Login', order: 1 }, { path: 'register', name: 'Register', order: 2 }],
-    },
-]));
-//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQGFicC9uZy5hY2NvdW50LyIsInNvdXJjZXMiOlsibGliL2NvbnN0YW50cy9yb3V0ZXMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7QUFFQSxNQUFNLEtBQU8sY0FBYyxHQUFHLG1CQUFBO0lBQzVCO1FBQ0UsSUFBSSxFQUFFLFNBQVM7UUFDZixJQUFJLEVBQUUsU0FBUztRQUNmLFNBQVMsRUFBRSxJQUFJO1FBQ2YsTUFBTSxpQ0FBeUI7UUFDL0IsUUFBUSxFQUFFLENBQUMsRUFBRSxJQUFJLEVBQUUsT0FBTyxFQUFFLElBQUksRUFBRSxPQUFPLEVBQUUsS0FBSyxFQUFFLENBQUMsRUFBRSxFQUFFLEVBQUUsSUFBSSxFQUFFLFVBQVUsRUFBRSxJQUFJLEVBQUUsVUFBVSxFQUFFLEtBQUssRUFBRSxDQUFDLEVBQUUsQ0FBQztLQUN6RztDQUNGLEVBQW1CIiwic291cmNlc0NvbnRlbnQiOlsiaW1wb3J0IHsgQUJQLCBlTGF5b3V0VHlwZSB9IGZyb20gJ0BhYnAvbmcuY29yZSc7XG5cbmV4cG9ydCBjb25zdCBBQ0NPVU5UX1JPVVRFUyA9IFtcbiAge1xuICAgIG5hbWU6ICdBY2NvdW50JyxcbiAgICBwYXRoOiAnYWNjb3VudCcsXG4gICAgaW52aXNpYmxlOiB0cnVlLFxuICAgIGxheW91dDogZUxheW91dFR5cGUuYXBwbGljYXRpb24sXG4gICAgY2hpbGRyZW46IFt7IHBhdGg6ICdsb2dpbicsIG5hbWU6ICdMb2dpbicsIG9yZGVyOiAxIH0sIHsgcGF0aDogJ3JlZ2lzdGVyJywgbmFtZTogJ1JlZ2lzdGVyJywgb3JkZXI6IDIgfV0sXG4gIH0sXG5dIGFzIEFCUC5GdWxsUm91dGVbXTtcbiJdfQ==
+/**
+ *
+ * @deprecated since version 0.9
+ * @type {?}
+ */
+export var ACCOUNT_ROUTES = {
+    routes: (/** @type {?} */ ([
+        {
+            name: 'Account',
+            path: 'account',
+            invisible: true,
+            layout: "application" /* application */,
+            children: [{ path: 'login', name: 'Login', order: 1 }, { path: 'register', name: 'Register', order: 2 }],
+        },
+    ])),
+};
+//# sourceMappingURL=data:application/json;base64,eyJ2ZXJzaW9uIjozLCJmaWxlIjoicm91dGVzLmpzIiwic291cmNlUm9vdCI6Im5nOi8vQGFicC9uZy5hY2NvdW50LyIsInNvdXJjZXMiOlsibGliL2NvbnN0YW50cy9yb3V0ZXMudHMiXSwibmFtZXMiOltdLCJtYXBwaW5ncyI6Ijs7Ozs7Ozs7OztBQU1BLE1BQU0sS0FBTyxjQUFjLEdBQUc7SUFDNUIsTUFBTSxFQUFFLG1CQUFBO1FBQ047WUFDRSxJQUFJLEVBQUUsU0FBUztZQUNmLElBQUksRUFBRSxTQUFTO1lBQ2YsU0FBUyxFQUFFLElBQUk7WUFDZixNQUFNLGlDQUF5QjtZQUMvQixRQUFRLEVBQUUsQ0FBQyxFQUFFLElBQUksRUFBRSxPQUFPLEVBQUUsSUFBSSxFQUFFLE9BQU8sRUFBRSxLQUFLLEVBQUUsQ0FBQyxFQUFFLEVBQUUsRUFBRSxJQUFJLEVBQUUsVUFBVSxFQUFFLElBQUksRUFBRSxVQUFVLEVBQUUsS0FBSyxFQUFFLENBQUMsRUFBRSxDQUFDO1NBQ3pHO0tBQ0YsRUFBbUI7Q0FDckIiLCJzb3VyY2VzQ29udGVudCI6WyJpbXBvcnQgeyBBQlAsIGVMYXlvdXRUeXBlIH0gZnJvbSAnQGFicC9uZy5jb3JlJztcclxuXHJcbi8qKlxyXG4gKlxyXG4gKiBAZGVwcmVjYXRlZCBzaW5jZSB2ZXJzaW9uIDAuOVxyXG4gKi9cclxuZXhwb3J0IGNvbnN0IEFDQ09VTlRfUk9VVEVTID0ge1xyXG4gIHJvdXRlczogW1xyXG4gICAge1xyXG4gICAgICBuYW1lOiAnQWNjb3VudCcsXHJcbiAgICAgIHBhdGg6ICdhY2NvdW50JyxcclxuICAgICAgaW52aXNpYmxlOiB0cnVlLFxyXG4gICAgICBsYXlvdXQ6IGVMYXlvdXRUeXBlLmFwcGxpY2F0aW9uLFxyXG4gICAgICBjaGlsZHJlbjogW3sgcGF0aDogJ2xvZ2luJywgbmFtZTogJ0xvZ2luJywgb3JkZXI6IDEgfSwgeyBwYXRoOiAncmVnaXN0ZXInLCBuYW1lOiAnUmVnaXN0ZXInLCBvcmRlcjogMiB9XSxcclxuICAgIH0sXHJcbiAgXSBhcyBBQlAuRnVsbFJvdXRlW10sXHJcbn07XHJcbiJdfQ==

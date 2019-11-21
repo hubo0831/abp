@@ -15,7 +15,7 @@ namespace Volo.Abp.Modularity
         /// <summary>默认配置</summary>
         public IConfiguration DefaultConfiguration { get; set; }
         /// <summary>获得默认主机环境</summary>
-        public IHostingEnvironment DefaultHostingEnvironment { get; set; }
+        public IHostEnvironment DefaultHostEnvironment { get; set; }
 
         public IDictionary<string, object> Items { get; }
 
@@ -38,7 +38,7 @@ namespace Volo.Abp.Modularity
         {
             Services = Check.NotNull(services, nameof(services));
             DefaultConfiguration = services.GetSingletonInstance<IConfiguration>();
-            DefaultHostingEnvironment = services.GetSingletonInstance<IHostingEnvironment>();
+            DefaultHostEnvironment = services.GetSingletonInstance<IHostEnvironment>();
             Items = new Dictionary<string, object>();
         }
     }

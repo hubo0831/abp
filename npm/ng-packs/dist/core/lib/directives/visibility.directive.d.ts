@@ -8,4 +8,5 @@ export declare class VisibilityDirective implements AfterViewInit {
     constructor(elRef: ElementRef, renderer: Renderer2);
     ngAfterViewInit(): void;
     disconnect(): void;
+    removeFromDOM(): void;
 }

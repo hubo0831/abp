@@ -17,14 +17,14 @@ namespace Volo.Abp.EntityFrameworkCore.SqlServer
             this.ReplaceServices = copyFrom.ReplaceServices;
         }
         public IServiceCollection ReplaceServices { get; }
-        public override bool ApplyServices(IServiceCollection services)
+        public override void ApplyServices(IServiceCollection services)
         {
-            foreach (ServiceDescriptor descriptor in this.ReplaceServices)
+            foreach (var descriptor in this.ReplaceServices)
             {
                 services.Add(descriptor);
             }
             this.ReplaceServices.Clear();
-            return base.ApplyServices(services);
+            base.ApplyServices(services);
         }
         protected override RelationalOptionsExtension Clone()
         {

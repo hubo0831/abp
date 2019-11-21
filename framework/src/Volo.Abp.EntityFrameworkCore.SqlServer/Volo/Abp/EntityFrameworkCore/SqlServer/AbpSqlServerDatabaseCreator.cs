@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SqlClient;
 using System.Reflection;
 using System.Threading;
 using System.Threading.Tasks;
-
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 using Microsoft.EntityFrameworkCore.Migrations;
@@ -38,7 +37,7 @@ namespace Volo.Abp.EntityFrameworkCore.SqlServer
         {
             var sp = contextServices.ContextOptions.FindExtension<CoreOptionsExtension>().ApplicationServiceProvider;
             if (sp == null) return null;
-            var dbConnectionOptions = sp.GetRequiredService<IOptions<DbConnectionOptions>>().Value;
+            var dbConnectionOptions = sp.GetRequiredService<IOptions<AbpDbConnectionOptions>>().Value;
             return dbConnectionOptions.NewDatabasePath;
         }
         /// <summary>创建新数据库</summary>

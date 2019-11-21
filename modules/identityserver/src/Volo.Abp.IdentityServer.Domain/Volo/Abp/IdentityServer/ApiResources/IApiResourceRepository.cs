@@ -28,9 +28,15 @@ namespace Volo.Abp.IdentityServer.ApiResources
             CancellationToken cancellationToken = default
         );
 
-        //Task<List<ApiResource>> GetListAsync(
-        //    bool includeDetails = false,
-        //    CancellationToken cancellationToken = default
-        //);
+        Task<List<ApiResource>> GetListAsync(
+            bool includeDetails = false,
+            CancellationToken cancellationToken = default
+        );
+
+        Task<bool> CheckNameExistAsync(
+            string name,
+            Guid? expectedId = null,
+            CancellationToken cancellationToken = default
+        );
     }
 }

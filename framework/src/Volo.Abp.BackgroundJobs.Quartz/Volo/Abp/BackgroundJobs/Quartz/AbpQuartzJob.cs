@@ -19,7 +19,7 @@ namespace Volo.Abp.BackgroundJobs.Quartz
             using (var scope = this.ServiceProvider.CreateScope())
             {
                 this.ServiceProvider = scope.ServiceProvider;
-                using (var uow = this.UnitOfWorkManager.Begin(new UnitOfWorkOptions()))
+                using (var uow = this.UnitOfWorkManager.Begin(AbpUnitOfWorkOptions.Default))
                 {
                     var tenantId = GetTenantId(context);
                     using (this.CurrentTenant.Change(tenantId))

@@ -12,7 +12,7 @@ export declare class PermissionManagementComponent implements OnInit, OnChanges 
     providerKey: string;
     protected _visible: any;
     visible: boolean;
-    visibleChange: EventEmitter<boolean>;
+    readonly visibleChange: EventEmitter<boolean>;
     groups$: Observable<PermissionManagement.Group[]>;
     entityName$: Observable<string>;
     selectedGroup: PermissionManagement.Group;
@@ -25,14 +25,14 @@ export declare class PermissionManagementComponent implements OnInit, OnChanges 
     constructor(store: Store, renderer: Renderer2);
     ngOnInit(): void;
     getChecked(name: string): boolean;
-    isGrantedByRole(grantedProviders: PermissionManagement.GrantedProvider[]): boolean;
+    isGrantedByOtherProviderName(grantedProviders: PermissionManagement.GrantedProvider[]): boolean;
     onClickCheckbox(clickedPermission: PermissionManagement.Permission, value: any): void;
     setTabCheckboxState(): void;
     setGrantCheckboxState(): void;
     onClickSelectThisTab(): void;
     onClickSelectAll(): void;
     onChangeGroup(group: PermissionManagement.Group): void;
-    onSubmit(): void;
+    submit(): void;
     openModal(): void;
     initModal(): void;
     ngOnChanges({ visible }: SimpleChanges): void;
