@@ -20,9 +20,9 @@ namespace Microsoft.Extensions.DependencyInjection
 
         public static T GetSingletonInstanceOrNull<T>(this IServiceCollection services)
         {
-            return (T)services
-                .FirstOrDefault(d => d.ServiceType == typeof(T))
-                ?.ImplementationInstance;
+            var serviceDescriptor = services.FirstOrDefault(d => d.ServiceType == typeof(T));
+            if (serviceDescriptor == null) return default;
+            return (T)(serviceDescriptor.ImplementationInstance ?? serviceDescriptor.ImplementationFactory(null));
         }
         
         public static T GetSingletonInstance<T>(this IServiceCollection services)
